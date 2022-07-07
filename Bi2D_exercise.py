@@ -7,7 +7,8 @@ from scipy.optimize import curve_fit
 import addcopyfighandler
 
 #Initial Options
-histPlot = True
+histPlot = False
+stdPlot = True
 
 #Assumed time points of interest
 tdata = np.arange(8, 512, 8) #ms units
@@ -19,13 +20,14 @@ def biExp2D(tdata,c1, c2, T21, T22):
     return exp1 + exp2
 
 #How many iterations are we going to do of this fitting test
-iterCount = 1000
+iterCount = 200
 ParamTitle = ['c1','c2','T21','T22']
 paramStore = np.zeros([iterCount,np.size(ParamTitle)])
 SNRStore = np.zeros(iterCount)
 
 #Parameter varied to observe identifiability
-T22_range = np.arange(50,51,1)
+T22_range = np.arange(40,71,2.5)
+# T22_range = [45]
 
 stdStore = np.zeros([np.size(T22_range),np.size(ParamTitle)])
 
@@ -46,7 +48,9 @@ for j in range(np.size(T22_range)):
     for i in range(iterCount):
 
         #Determining the noise
-        noiseSigma = np.mean(trueDat)/800
+        SNR = 800
+        # noiseSigma = 1/SNR
+        noiseSigma = np.mean(trueDat)/SNR
         noise = np.random.normal(0,noiseSigma,tdata.size)
 
         noiseDat = trueDat + noise
@@ -60,7 +64,9 @@ for j in range(np.size(T22_range)):
         avgMSNR = np.absolute(np.mean(mSNR))
         SNRStore[i] = avgMSNR
 
-        popt,pcov = curve_fit(biExp2D, tdata, noiseDat, bounds = [(0,0,-np.inf,-np.inf),(1,1,np.inf,np.inf)])
+        popt,pcov = curve_fit(biExp2D, tdata, noiseDat, bounds = [(0,0,0,0),(1,1,np.inf,np.inf)])
+        # random_start = np.random.rand(1,4)*[1,1,100,100]
+        # popt,pcov = curve_fit(biExp2D, tdata, noiseDat, p0=random_start)
 
         if (popt[0] > popt[1]):
             p_hold = popt[0]
@@ -74,18 +80,27 @@ for j in range(np.size(T22_range)):
 
         paramStore[i,:] = popt
         
-    runStd = np.std(paramStore, axis = 1)
+    runStd = np.std(paramStore, axis = 0)
 
     stdStore[j,:] = runStd
 
-    # fig, ax = plt.subplots(2,2)
+    if histPlot:
+        for i in range(2):
+            plt.hist(x=paramStore[:,2*i], bins='auto', color='#0504aa')
+            plt.hist(x=paramStore[:,2*i+1], bins='auto', color='#454B1B')
+            plt.xlabel('Param Value')
+            plt.ylabel('Count')
+            plt.title(ParamTitle[2*i] + ' against ' + ParamTitle[2*i+1])
+            plt.show()
 
-if histPlot:
-    for i in range(2):
-        plt.hist(x=paramStore[:,2*i], bins='auto', color='#0504aa')
-        plt.hist(x=paramStore[:,2*i+1], bins='auto', color='#454B1B')
-        plt.xlabel('Param Value')
-        plt.ylabel('Count')
-        plt.title(ParamTitle[2*i] + ' against ' + ParamTitle[2*i+1])
-        plt.show()
 
+if stdPlot:
+    plt.plot(T22_range,stdStore[:,0])
+    plt.plot(T22_range,stdStore[:,1])
+    plt.plot(T22_range,stdStore[:,2])
+    plt.plot(T22_range,stdStore[:,3])
+    plt.xlabel('T_{2,2} Value')
+    plt.ylabel('Standard Deviation')
+    plt.title('T_{2,2} Influence on Standard Deviation')
+    plt.legend(['c1','c2','T_{2,1}','T_{2,2}'])
+    plt.show()
