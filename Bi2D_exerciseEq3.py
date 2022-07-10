@@ -1,4 +1,6 @@
 #This is the python script for replicating the Bi,Spencer 2D stabilization technique
+#Thisfile makes it possible to estimate parameter values for the two dimensional and two
+#compartamental model
 
 #Preparing all libraries
 import matplotlib.pyplot as plt
@@ -40,16 +42,7 @@ T12 = 500
 T21 = 60
 T22 = 40
 
-# allDat = np.zeros(np.size(TE)*np.size(TI))
-# all_t = np.zeros([np.size(allDat)],dtype='f,f')
-
 realParams = (c1,T11,T21,c2,T12,T22)
-
-# for i in range(np.size(TE)):
-#     for j in range(np.size(TI)):
-#         index = i*np.size(TI)+j
-#         all_t[index] = (TI[j],TE[i])
-#         allDat[index] = biExp2D(TI[j],TE[i],*realParams)
 
 TI,TE = np.meshgrid(TI,TE)
 truDat = biExp2D(TI,TE,*realParams)
@@ -75,10 +68,6 @@ for i in range(iterCount):
     noise = np.random.normal(0,noiseSigma,np.size(ydata))
 
     noiseDat = ydata + noise
-
-    #More accurate SNR calculation - found online
-    # np.sum(np.abs(np.fft.fft(cleanSound,sampling_rate//2)/Nsamples)**2)
-    # mSNR = 10*np.log10(trueDat,noiseDat)
 
     #Experimental Signal to Noise Ratio Calculation
     mSNR = noiseDat/noise

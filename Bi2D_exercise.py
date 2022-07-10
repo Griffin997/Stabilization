@@ -7,8 +7,8 @@ from scipy.optimize import curve_fit
 import addcopyfighandler
 
 #Initial Options
-histPlot = False
-stdPlot = True
+histPlot = True
+stdPlot = False
 
 #Assumed time points of interest
 tdata = np.arange(8, 512, 8) #ms units
@@ -26,14 +26,14 @@ paramStore = np.zeros([iterCount,np.size(ParamTitle)])
 SNRStore = np.zeros(iterCount)
 
 #Parameter varied to observe identifiability
-T22_range = np.arange(40,71,2.5)
-# T22_range = [45]
+# T22_range = np.arange(40,71,2.5)
+T22_range = [40]
 
 stdStore = np.zeros([np.size(T22_range),np.size(ParamTitle)])
 
 #Parameters held constant
-c1 = 0.3
-c2 = 0.7
+c1 = 0.02
+c2 = 1-c1
 T21 = 60
 
 
