@@ -1,4 +1,7 @@
 #This is the python script for replicating the Bi,Spencer 2D stabilization technique
+#with the intention of varying TI for Eq.3 to observe the TI related nullpoint - this
+#code has the potential to look at a histogram for each TI value or to look at the
+#standard deviation across the population for a range of TI values
 
 #Preparing all libraries
 from lzma import CHECK_SHA256

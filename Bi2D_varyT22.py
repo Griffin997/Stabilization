@@ -1,4 +1,9 @@
 #This is the python script for replicating the Bi,Spencer 2D stabilization technique
+#in only a single dimension of TE time. The intention of this experiment is to look 
+#at how varying TE translates into an identifiability issue - we are replicating the 
+# figures from the Bi, Spencer paper that show histograms of the estimated values - this
+#code has the potential to look at a histogram for each TE value or to look at the
+#standard deviation across the population for a range of TE values
 
 #Preparing all libraries
 import matplotlib.pyplot as plt
