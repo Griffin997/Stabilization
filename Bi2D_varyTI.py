@@ -4,7 +4,6 @@
 #standard deviation across the population for a range of TI values
 
 #Preparing all libraries
-from lzma import CHECK_SHA256
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
@@ -13,6 +12,7 @@ import addcopyfighandler
 #Initial Options
 histPlot = False
 stdPlot = True
+cNPPlot = False
 
 #Assumed echo time points
 tdata = np.arange(8, 512, 8) #ms units
@@ -26,11 +26,11 @@ T11 = 400
 T12 = 1200
 #Parameter varied to observe identifiability
 # T22_range = np.arange(40,71,2.5)
-T22_range = [20]
+T22_range = [45]
 #Information determing TI range
-TI_numPoints = 101
-TI_lb = 0.5
-TI_ub = 1.5
+TI_numPoints = 31
+TI_lb = 0.8
+TI_ub = 1.2
 assert(TI_ub>TI_lb)
 #Process related parameters
 iterCount = 1000 #number of iterations that curveFit is applied
@@ -48,12 +48,28 @@ def biExp2D(tdata, TI, T11, T12, c1, c2, T21, T22):
     exp2 = c2*(1-2*np.exp(-TI/T12))*np.exp(-tdata/T22)
     return exp1 + exp2
 
+# #Pulled from Ryan Neff's code
+def Jacobian_2D(TI, TE, c1, c2, T11, T12, T21, T22):
+    #Returns the Jacobian of our 6 parameter, 2D problem
+    dc1 = (1-2*np.exp(-TI/T11))*np.exp(-TE/T21)
+    dc2 = (1-2*np.exp(-TI/T12))*np.exp(-TE/T22)
+    dT11 = (-2*c1*TI/T11**2)*np.exp(-(TI/T11 + TE/T21))
+    dT12 = (-2*c2*TI/T12**2)*np.exp(-(TI/T12 + TE/T22))
+    dT21 = (c1*TE/T21**2)*(1-2*np.exp(-TI/T11))*np.exp(-TE/T21)
+    dT22 = (c2*TE/T22**2)*(1-2*np.exp(-TI/T12))*np.exp(-TE/T22)
+    
+    jacobian = np.stack((dc1, dc2, dT11, dT12, dT21, dT22), axis = -1)
+    return jacobian
+
 #How many iterations are we going to do of this fitting test
 ParamTitle = ['c1','c2','T21','T22']
 paramStore = np.zeros([iterCount,np.size(ParamTitle)])
 SNRStore = np.zeros([iterCount,np.size(TI_array)])
 stdStore = np.zeros([np.size(TI_array),np.size(ParamTitle)])
 std2Store = np.zeros([np.size(TI_array),np.size(ParamTitle)])
+BmatStore = np.zeros([iterCount,np.size(ParamTitle)])
+# cNPStore = np.zeros([np.size(TI_array),1]) #Coordination Number of the Parameter Matrix
+cNJStore = np.zeros([iterCount,np.size(TI_array)])
 # cNquickStore = np.zeros([np.size(TI_array),np.size(ParamTitle)]) #To be implemented later
 
 #Looping through all TI values in the TI_array
@@ -106,6 +122,10 @@ for k in range(np.size(TI_array)):
                 popt[3] = p_hold
 
             paramStore[i,:] = popt
+
+            # B = Jacobian_2D(TI,tdata,popt[0],popt[1],T11,T12,popt[2],popt[3]) #TI, TE, c1, c2, T11, T12, T21, T22
+            # covP = np.dot(B.T,B)*noiseSigma**2
+            # BmatStore[i,k] = np.linalg.norm(covP,'fro')*np.linalg.norm(np.linalg.inv(covP),ord='fro')
             
         
 
@@ -140,10 +160,14 @@ for k in range(np.size(TI_array)):
     std2 = np.var(paramStore,axis = 0)**(1/2)
     std2Store[k,:] = std2
 
+    # covParm = np.cov(paramStore)
+
+    # cNPStore[k] = np.linalg.norm(covParm,ord='fro')*np.linalg.norm(np.linalg.inv(covParm),ord='fro')
+
 
 if stdPlot:
     for i in range(np.size(ParamTitle)):
-        plt.plot(TI_array,stdStore[:,i], label = ParamTitle[i])
+        plt.plot(TI_array,stdStore[:,i], label = ParamTitle[i], alpha = 0.7)
     plt.axvline(x=TI1star, linewidth=1, label= 'TI1 nullpoint', color='k')
     plt.xlabel('TI Value')
     plt.ylabel('Standard Deviation of Parameter')
@@ -159,3 +183,12 @@ if stdPlot:
     # plt.title('TI Influence on ParameterStandard Deviation')
     # plt.legend()
     # plt.show()
+
+if cNPPlot:
+    plt.plot(TI_array,cNPStore, label = "Coordination Number", alpha = 0.7)
+    plt.axvline(x=TI1star, linewidth=1, label= 'TI1 nullpoint', color='k')
+    plt.xlabel('TI Value')
+    plt.ylabel('Standard Deviation of Parameter')
+    plt.title('TI Influence on Parameter Standard Deviation')
+    plt.legend()
+    plt.show()
