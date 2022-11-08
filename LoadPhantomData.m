@@ -85,3 +85,5 @@ figure
 plot(1:1:2048, avg_signal,'k-')
 xlabel('TE')
 ylabel('Signal')
+
+save("Data/phased_dataset.mat",'phased_dataset')
