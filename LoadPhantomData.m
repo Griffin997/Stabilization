@@ -19,8 +19,8 @@ range = max_slice-min_slice;
 
 figure
 plot(1:1:2048,avg_slice(:,:))
-% ylim([0,10000])
-% xlim([0,200])
+ylim([0,10000])
+xlim([0,200])
 
 %%
 
@@ -85,5 +85,16 @@ figure
 plot(1:1:2048, avg_signal,'k-')
 xlabel('TE')
 ylabel('Signal')
+title("Phased")
 
-save("Data/phased_dataset.mat",'phased_dataset')
+% save("Data/phased_dataset.mat",'phased_dataset')
+
+signal_dataset = real(unphased_dataset);
+
+avg_signal = mean(signal_dataset,3);
+
+figure
+plot(1:1:2048, avg_signal,'k-')
+xlabel('TE')
+ylabel('Signal')
+title("Unphased")
