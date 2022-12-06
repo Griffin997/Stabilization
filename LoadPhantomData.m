@@ -87,7 +87,91 @@ xlabel('TE')
 ylabel('Signal')
 title("Phased")
 
-% save("Data/phased_dataset.mat",'phased_dataset')
+signal_dataset = real(unphased_dataset);
+
+save("Data/signal_dataset.mat",'signal_dataset')
+
+avg_signal = mean(signal_dataset,3);
+
+figure
+plot(1:1:2048, avg_signal,'k-')
+xlabel('TE')
+ylabel('Signal')
+title("Unphased")
+
+%% Phasing with more accurate phase shift values
+
+f1D=fopen('Data/ser','r');
+data_C_2D=fread(f1D,[2,13107200],'int32');
+fclose(f1D);
+
+data_C_1D = complex(data_C_2D(1,:), data_C_2D(2,:));
+
+repetitions = 100;
+nTIs = 64;
+nTEs = 2048;
+
+unphased_dataset = reshape(data_C_1D, nTEs, nTIs, repetitions);
+calc_phase = angle(unphased_dataset);
+% calc_phase = reshape(data_phase, nTEs, nTIs, repetitions);
+
+figure;
+subplot(1,2,1)
+plot(1:1:2048, calc_phase(:,1,1), 'k-')
+title('Echos of First TI')
+subplot(1,2,2)
+plot(1:1:2048, calc_phase(:,end,1), 'k-')
+title('Echos of Last TI')
+
+%We choose only the first signal
+first_calc_phase = squeeze(calc_phase(1,:,:));
+
+phase_shift = (first_calc_phase);
+
+phased_complex_ser = zeros(size(unphased_dataset));
+for ii = 1:size(phase_shift,1)
+    for j = 1:size(phase_shift,2)
+        val_phase_shift = phase_shift(ii,j);
+        phased_complex_ser(:,ii,j) = unphased_dataset(:,ii,j)*exp(-1i*val_phase_shift);
+%         phased_complex_ser(:,ii,j) = unphased_dataset(:,ii,j)*complex(cos(val_phase_shift),sin(val_phase_shift*pi/180));
+    end
+end
+phased_complex_ser = phased_complex_ser(:);
+
+figure;
+subplot(2,2,1)
+plot(real(data_C_1D(1:(2048*64))));
+title('Real Unphased Data - Rep 1')
+xlabel('Echo Intensity')
+
+subplot(2,2,2)
+plot(real(phased_complex_ser(1:(2048*64))));
+title('Real Phased Data - Rep 1')
+xlabel('Echo Intensity')
+
+subplot(2,2,3)
+plot(imag(data_C_1D(1:(2048*64))));
+title('Imaginary Unphased Data - Rep 1')
+xlabel('Echo Intensity')
+
+subplot(2,2,4)
+plot(imag(phased_complex_ser(1:(2048*64))));
+title('Imaginary Phased Data - Rep 1')
+xlabel('Echo Intensity')
+
+phased_dataset=reshape(phased_complex_ser, nTEs, nTIs, repetitions);
+
+signal_dataset = real(phased_dataset);
+
+avg_signal = mean(signal_dataset,3);
+
+figure
+plot(1:1:2048, avg_signal,'k-')
+xlabel('TE')
+ylabel('Signal')
+title("Phased")
+
+% save("Data/signal_dataset.mat",'signal_dataset')
 
 signal_dataset = real(unphased_dataset);
 
