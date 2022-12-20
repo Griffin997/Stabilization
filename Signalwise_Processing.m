@@ -28,6 +28,8 @@ repetitions = repetitions - 1;
 real_unphased_dataset = real(unphased_dataset);
 imag_unphased_dataset = imag(unphased_dataset);
 
+save("Data/unphased_dataset.mat",'unphased_dataset')
+
 save("Data/real_unphased_dataset.mat",'real_unphased_dataset')
 save("Data/imag_unphased_dataset.mat",'imag_unphased_dataset')
 
