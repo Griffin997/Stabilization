@@ -10,9 +10,4 @@ pandas
 scipy
 seaborn
 tqdm
-h5py
-torch
-keras
-sklearn
 addcopyfighandler
-tensorflow
