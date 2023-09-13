@@ -58,7 +58,7 @@ TI2star = np.log(2)*T12
 #SNR Value to Evaluate
 SNR_value = 100
 
-var_reps = 10
+var_reps = 1000
 
 #number of multistarts in the BIC filter to ensure accurate measurement
 multi_starts_BIC = 3
