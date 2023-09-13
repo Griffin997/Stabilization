@@ -72,8 +72,8 @@ else:
 BIC_eval_iter = 100     
 
 #These are the TI points that we are going to check around the null point
-TI1_region = np.arange(-20,21,40)
-TI2_region = np.arange(-20,21,40)
+TI1_region = np.arange(-150,151,10)
+TI2_region = np.arange(-120,121,10)
 
 target_iterator = [(a, b) for a in np.floor(TI1star)+TI1_region for b in np.floor(TI2star)+TI2_region]
 
@@ -92,7 +92,7 @@ day = date.strftime('%d')
 month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
-num_cpus_avail = 1
+num_cpus_avail = 30
 data_path = "CustomObjFunc/npProximity_Data"
 data_tag = ("npProx_" + day + month + year)
 data_folder = (os.getcwd() + f'/{data_path}')
