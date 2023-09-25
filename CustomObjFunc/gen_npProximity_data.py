@@ -72,8 +72,8 @@ else:
 BIC_eval_iter = 100     
 
 #These are the TI points that we are going to check around the null point
-TI1_region = np.arange(-150,151,10)
-TI2_region = np.arange(-120,121,10)
+TI1_region = np.arange(-200,201,10)
+TI2_region = np.arange(-180,181,10)
 
 target_iterator = [(a, b) for a in np.floor(TI1star)+TI1_region for b in np.floor(TI2star)+TI2_region]
 
@@ -92,7 +92,7 @@ day = date.strftime('%d')
 month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
-num_cpus_avail = 30
+num_cpus_avail = 35
 data_path = "CustomObjFunc/npProximity_Data"
 data_tag = ("npProx_" + day + month + year)
 data_folder = (os.getcwd() + f'/{data_path}')
@@ -336,9 +336,11 @@ def estimate_parameters(TE_DATA, TI_DATA, noised_data, lb, ub, list_curve_BIC, l
 
     cF_fval = np.inf
 
+    no_opt_found = 0
+
     for ms_iter in range(multi_starts_obj):
         init_p = set_p0(S_biX_6p, random = randStart)
-        
+
         try:
             vecS = noised_data.ravel()
             popt_temp, _ = curve_fit(S_biX_6p_ravel, vecT, vecS, p0 = init_p, bounds = [lb, ub], method = 'trf', maxfev = 5000)
@@ -351,7 +353,27 @@ def estimate_parameters(TE_DATA, TI_DATA, noised_data, lb, ub, list_curve_BIC, l
                 RSS_cF = RSS_cF_temp
                 cF_fval = RSS_cF_temp
         except:
-            print("\nNo Optimum found")
+            no_opt_found+=1
+
+    #This is the failsafe to ensure that some parameters are found
+    if no_opt_found == multi_starts_obj:
+        print("Overtime")
+        while no_opt_found > 0:
+            init_p = set_p0(S_biX_6p, random = randStart)
+            try:
+                vecS = noised_data.ravel()
+                popt_temp, _ = curve_fit(S_biX_6p_ravel, vecT, vecS, p0 = init_p, bounds = [lb, ub], method = 'trf', maxfev = 5000)
+                RSS_cF_array = []
+                for iter in range(noised_data.shape[0]):
+                    RSS_cF_array.append(calculate_RSS_TI(S_biX_6p, popt_temp, TI_DATA[iter], noised_data[iter,:]))
+                RSS_cF_temp = np.sum(RSS_cF_array)
+                if RSS_cF_temp < cF_fval:
+                    popt = popt_temp
+                    RSS_cF = RSS_cF_temp
+                    cF_fval = RSS_cF_temp
+                no_opt_found = 0
+            except:
+                no_opt_found = 1
 
     bnds = bounds_condensed(lb, ub)
 
