@@ -58,7 +58,7 @@ TI2star = np.log(2)*T12
 #SNR Value to Evaluate
 SNR_value = 100
 
-var_reps = 2000
+var_reps = 1000
 
 #number of multistarts in the BIC filter to ensure accurate measurement
 multi_starts_BIC = 3
@@ -336,11 +336,11 @@ def estimate_parameters(TE_DATA, TI_DATA, noised_data, lb, ub, list_curve_BIC, l
 
     cF_fval = np.inf
 
+    no_opt_found = 0
+
     for ms_iter in range(multi_starts_obj):
         init_p = set_p0(S_biX_6p, random = randStart)
 
-        no_opt_found = 0
-        
         try:
             vecS = noised_data.ravel()
             popt_temp, _ = curve_fit(S_biX_6p_ravel, vecT, vecS, p0 = init_p, bounds = [lb, ub], method = 'trf', maxfev = 5000)
