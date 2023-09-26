@@ -72,8 +72,8 @@ else:
 BIC_eval_iter = 100     
 
 #These are the TI points that we are going to check around the null point
-TI1_region = np.arange(-200,201,10)
-TI2_region = np.arange(-180,181,10)
+TI1_region = np.arange(-300,301,10)
+TI2_region = np.arange(-250,251,10)
 
 target_iterator = [(a, b) for a in np.floor(TI1star)+TI1_region for b in np.floor(TI2star)+TI2_region]
 
