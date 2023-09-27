@@ -93,7 +93,7 @@ month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
 num_cpus_avail = 35
-data_path = "CustomObjFunc/npProximity_Data"
+data_path = "CustomObjFunc_AIC/npProximity_Data"
 data_tag = ("npProx_" + day + month + year)
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
