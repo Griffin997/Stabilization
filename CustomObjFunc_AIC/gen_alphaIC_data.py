@@ -94,7 +94,7 @@ day = date.strftime('%d')
 month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
-num_cpus_avail = 35
+num_cpus_avail = 8
 data_path = "CustomObjFunc_AIC/alphaData"
 data_tag = ("alphaData_" + day + month + year)
 data_folder = (os.getcwd() + f'/{data_path}')
