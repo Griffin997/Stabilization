@@ -72,10 +72,10 @@ else:
 AIC_eval_iter = 100     
 
 #These are the TI points that we are going to check around the null point
-TI1_array = np.array([-75,-50,-25,0,25,50,75])+np.floor(TI1star)
-TI2_array = np.array([-75,-50,-25,0,25,50,75])+np.floor(TI2star)
-alpha_array = np.linspace(1,0.9,20)
-alpha_array = np.append(alpha_array,[0.7,0.5,0.2,0])
+TI1_array = np.array([-50,-25,0,25,50])+np.floor(TI1star)
+TI2_array = np.array([-50,-25,0,25,50])+np.floor(TI2star)
+alpha_array = np.linspace(1,0.9,30)
+
 
 target_iterator = [(a, b, c) for a in TI1_array for b in TI2_array for c in alpha_array]
 
@@ -94,7 +94,7 @@ day = date.strftime('%d')
 month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
-num_cpus_avail = 8
+num_cpus_avail = 50
 data_path = "CustomObjFunc_AIC/alphaData"
 data_tag = ("alphaData_" + day + month + year)
 data_folder = (os.getcwd() + f'/{data_path}')
