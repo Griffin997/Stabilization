@@ -54,14 +54,14 @@ TE_DATA = np.linspace(TE_step, TE_step*n_TE, n_TE) #ms units
 
 TI_STANDARD = np.append(0,np.logspace(1,np.log10(3*T12),11))//1
 
-rad_diff = 0.05
+rad_diff = 0.025
 np_radius = 1 + np.array([-2, -1, 0 , 1, 2])*rad_diff
 
 TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
 
 #These are the percents that we will allow the center of the null point window to move by
-center_range = 0.1
+center_range = 0.10
 num_centers = 15
 center_diff_array = 1+np.linspace(-1*center_range,center_range, num_centers)
 
