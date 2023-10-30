@@ -62,7 +62,7 @@ TI2star = np.log(2)*T12
 
 #These are the percents that we will allow the center of the null point window to move by
 center_range = 0.15
-center_diff_array = 1+np.arange(-1*center_range,center_range,11)
+center_diff_array = 1+np.linspace(-1*center_range,center_range,11)
 
 #SNR Value to Evaluate
 SNR_value = 100
@@ -97,7 +97,7 @@ day = date.strftime('%d')
 month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
-num_cpus_avail = 1
+num_cpus_avail = len(target_iterator)
 data_path = "Espresso_Method/npWindow_Data"
 data_tag = (f"npWindow_AIC_sp_{rad_diff}_rng_{center_range}_{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
@@ -386,7 +386,7 @@ def estimate_parameters(TE_DATA, TI_DATA, noised_data, lb, ub, list_curve_AIC, l
     #Pulling relevant cF objective function parts
     param_est_cF = check_param_order(popt)
 
-    return param_est_AIC, param_est_cvn, param_est_cF, param_est_AIC
+    return param_est_AIC, param_est_cvn, param_est_cF
 
 def generate_all_estimates(i_param_combo):
     #Generates a comprehensive matrix of all parameter estimates for all param combinations, 
