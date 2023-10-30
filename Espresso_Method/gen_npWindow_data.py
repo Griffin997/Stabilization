@@ -61,8 +61,9 @@ TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
 
 #These are the percents that we will allow the center of the null point window to move by
-center_range = 0.15
-center_diff_array = 1+np.linspace(-1*center_range,center_range,11)
+center_range = 0.1
+num_centers = 15
+center_diff_array = 1+np.linspace(-1*center_range,center_range, num_centers)
 
 #SNR Value to Evaluate
 SNR_value = 100
@@ -400,7 +401,7 @@ def generate_all_estimates(i_param_combo):
 
     SNR_eTime = SNR_value*(np.sum(TI_STANDARD)/np.sum(TI_ESPRESSO))**(1/2)
 
-    feature_df = pd.DataFrame(columns = ["Center","TI_DATA","SNR_eTime","MSE", "Var", "Bias", "AIC", "pEst_AIC", "pEst_cf"])
+    feature_df = pd.DataFrame(columns = ["Center","TI_DATA","SNR_eTime","MSE", "Var", "bias", "AIC", "pEst_AIC", "pEst_cf"])
 
     feature_df["Center"] = [center_diff]
     feature_df["TI_DATA"] = [TI_ESPRESSO]
@@ -491,6 +492,7 @@ hprParams = {
     'rad_diff': rad_diff,
     'center_range': center_range,
     "center_diff_array": center_diff_array,
+    "num_centers": num_centers,
     "true_params": true_params,
     "SNR_value": SNR_value,
     "nTE": n_TE,
