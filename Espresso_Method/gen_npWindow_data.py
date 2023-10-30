@@ -400,9 +400,10 @@ def generate_all_estimates(i_param_combo):
 
     SNR_eTime = SNR_value*(np.sum(TI_STANDARD)/np.sum(TI_ESPRESSO))**(1/2)
 
-    feature_df = pd.DataFrame(columns = ["TI_DATA","SNR","MSE", "Var", "Bias", "AIC"])
+    feature_df = pd.DataFrame(columns = ["Center","TI_DATA","SNR_eTime","MSE", "Var", "Bias", "AIC", "pEst_AIC", "pEst_cf"])
 
-    feature_df["TI_combo"] = [TI_ESPRESSO]
+    feature_df["Center"] = [center_diff]
+    feature_df["TI_DATA"] = [TI_ESPRESSO]
     feature_df["SNR_eTime"] = [SNR_eTime]
 
     signal_array = np.zeros([len(TI_ESPRESSO), len(TE_DATA)])
@@ -445,6 +446,8 @@ def generate_all_estimates(i_param_combo):
     feature_df['var'] = [var_mat]
     feature_df['bias'] = [bias_mat]
     feature_df['AIC'] = [AIC_moX_analysis]
+    feature_df['pEst_AIC'] = [param_est_AIC]
+    feature_df['pEst_cf'] = [param_est_cF]
 
     return feature_df
 
@@ -486,7 +489,8 @@ if __name__ == '__main__':
 hprParams = {
     "SNR_value": SNR_value,
     'rad_diff': rad_diff,
-    "center_range": center_range,
+    'center_range': center_range,
+    "center_diff_array": center_diff_array,
     "true_params": true_params,
     "SNR_value": SNR_value,
     "nTE": n_TE,
