@@ -54,8 +54,8 @@ TE_DATA = np.linspace(TE_step, TE_step*n_TE, n_TE) #ms units
 
 TI_STANDARD = np.append(0,np.logspace(1,np.log10(3*T12),11))//1
 
-rad_diff = 0.025
-np_radius = 1 + np.array([-2, -1, 0 , 1, 2])*rad_diff
+rad_diff = 15
+np_radius = np.array([-2, -1, 0 , 1, 2])*rad_diff
 
 TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
@@ -393,8 +393,8 @@ def generate_all_estimates(i_param_combo):
     #Generates a comprehensive matrix of all parameter estimates for all param combinations, 
     #noise realizations, SNR values, and lambdas of interest
     center_diff = target_iterator[i_param_combo]
-    TI1_radius = (np.floor(TI1star)*center_diff*np_radius)//1
-    TI2_radius = (np.floor(TI2star)*center_diff*np_radius)//1
+    TI1_radius = (np.floor(TI1star)*center_diff+np_radius)//1
+    TI2_radius = (np.floor(TI2star)*center_diff+np_radius)//1
     TI_ESPRESSO_half1 = np.append(0, TI1_radius)
     TI_ESPRESSO_half2 = np.append(TI2_radius, TI_STANDARD[-1])
     TI_ESPRESSO = np.append(TI_ESPRESSO_half1, TI_ESPRESSO_half2)
