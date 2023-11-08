@@ -39,7 +39,7 @@ T12 = 1200
 c1 = 0.4
 c2 = 0.6 
 T21 = 40
-T22 = 60
+T22 = 100
 
 true_params = np.array([T11, T12, c1, c2, T21, T22])
 
@@ -54,7 +54,7 @@ TE_DATA = np.linspace(TE_step, TE_step*n_TE, n_TE) #ms units
 
 TI_STANDARD = np.append(0,np.logspace(1,np.log10(3*T12),11))//1
 
-rad_diff = 15
+rad_diff = 17
 np_radius = np.array([-2, -1, 0 , 1, 2])*rad_diff
 
 TI1star = np.log(2)*T11
@@ -66,7 +66,7 @@ num_centers = 15
 center_diff_array = 1+np.linspace(-1*center_range,center_range, num_centers)
 
 #SNR Value to Evaluate
-SNR_value = 100
+SNR_value = 50
 
 var_reps = 1000
 
