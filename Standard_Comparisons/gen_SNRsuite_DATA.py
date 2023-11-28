@@ -55,7 +55,7 @@ TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
 
 #SNR Values to Evaluate
-SNR_values = np.array([50,100,250,500,1000])
+SNR_values = np.array([50, 70, 80, 100, 125, 150, 200, 250, 300])
 
 var_reps = 1000
 
@@ -90,7 +90,7 @@ year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),40])
 data_path = "Standard_Comparisons/Comparison_DATA"
-data_tag = (f"SNRsuite__{day}{month}{year}")
+data_tag = (f"SNRsuite_{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
 
