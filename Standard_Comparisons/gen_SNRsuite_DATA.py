@@ -55,7 +55,7 @@ TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
 
 #SNR Values to Evaluate
-SNR_values = np.array([50, 70, 80, 100, 125, 150, 200, 250, 300])
+SNR_values = np.arange(55,100,5)
 
 var_reps = 1000
 

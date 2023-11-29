@@ -62,16 +62,13 @@ TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
 
 #Adjusting how the window center varies
-center1_range = 70
-center2_range = 70
-center1_num = 15
-center2_num = 15
+center_range = 70
+center_num = 15
 
-center1_array = np.linspace(-1*center1_range,center1_range, center1_num)
-center2_array = np.linspace(-1*center2_range,center2_range, center2_num)
+center_array = np.linspace(-1*center_range,center_range, center_num)
 
 #SNR Values to Evaluate
-SNR_values = np.arange(55,100,5)
+SNR_values = np.arange(50,150,5)
 
 var_reps = 1000
 
@@ -87,7 +84,7 @@ else:
 AIC_eval_iter = 100     
 
 
-target_iterator = [(a,b,c) for a in center1_array for b in center2_array for c in SNR_values]
+target_iterator = [(a,b) for a in center_array for b in SNR_values]
 
 #This implies that a truth for evaluate is moX and a false is biX
 curve_options = ["BiX", "MoX"] 
@@ -105,8 +102,8 @@ month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),50])
-data_path = "Espresso_Method/Window2D_Data"
-data_tag = (f"Window2D_AIC_sp_{rad_diff}_{day}{month}{year}")
+data_path = "Espresso_Method/Window1D_SNR_Data"
+data_tag = (f"Window1D_AIC_sp_{rad_diff}_{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
 
@@ -398,19 +395,18 @@ def estimate_parameters(TE_DATA, TI_DATA, noised_data, lb, ub, list_curve_AIC, l
 def generate_all_estimates(i_param_combo):
     #Generates a comprehensive matrix of all parameter estimates for all param combinations, 
     #noise realizations, SNR values, and lambdas of interest
-    center1_diff, center2_diff, SNR_value = target_iterator[i_param_combo]
-    TI1_radius = (np.floor(TI1star)+center1_diff+np_radius)//1
-    TI2_radius = (np.floor(TI2star)+center2_diff+np_radius)//1
+    center_diff, SNR_value = target_iterator[i_param_combo]
+    TI1_radius = (np.floor(TI1star)+center_diff+np_radius)//1
+    TI2_radius = (np.floor(TI2star)+center_diff+np_radius)//1
     TI_ESPRESSO_half1 = np.append(0, TI1_radius)
     TI_ESPRESSO_half2 = np.append(TI2_radius, TI_STANDARD[-1])
     TI_ESPRESSO = np.append(TI_ESPRESSO_half1, TI_ESPRESSO_half2)
 
     SNR_eTime = SNR_value*(np.sum(TI_STANDARD)/np.sum(TI_ESPRESSO))**(1/2)
 
-    feature_df = pd.DataFrame(columns = ["Center1","Center2","SNR","TI_DATA","SNR_eTime","MSE", "Var", "bias", "AIC", "pEst_AIC", "pEst_cf"])
+    feature_df = pd.DataFrame(columns = ["Center","SNR","TI_DATA","SNR_eTime","MSE", "Var", "bias", "AIC", "pEst_AIC", "pEst_cf"])
 
-    feature_df["Center1"] = [center1_diff]
-    feature_df["Center2"] = [center2_diff]
+    feature_df["Center"] = [center_diff]
     feature_df["SNR"] = [SNR_value]
     feature_df["TI_DATA"] = [TI_ESPRESSO]
     feature_df["SNR_eTime"] = [SNR_eTime]
@@ -497,9 +493,8 @@ if __name__ == '__main__':
 
 hprParams = {
     'rad_diff': rad_diff,               #separation between windows
-    "center1_array": center1_array,     #first iterator
-    "center2_array": center2_array,     #second iterator
-    "SNR_values": SNR_values,           #third iterator
+    "center_array": center_array,     #first iterator
+    "SNR_values": SNR_values,           #second iterator
     "true_params": true_params,
     "nTE": n_TE,
     "dTE": TE_step,
