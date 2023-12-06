@@ -35,7 +35,7 @@ randStart = True                  #Initial guess for parameter values in random 
 ######All Fixed parameters for code
 #Parameters held constant
 T11 = 600
-T12 = 1200
+T12 = 800
 c1 = 0.4
 c2 = 0.6 
 T21 = 40
@@ -103,7 +103,8 @@ year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),50])
 data_path = "Espresso_Method/Window1D_SNR_Data"
-data_tag = (f"Window1D_AIC_sp_{rad_diff}_{day}{month}{year}")
+add_tag = "illT1"
+data_tag = (f"Window1D_AIC_{add_tag}_sp_{rad_diff}_{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
 
@@ -503,6 +504,6 @@ hprParams = {
     'multi_start': multi_starts_obj
 }
 
-f = open(f'{data_folder}/hprParameter_AIC_sp_{rad_diff}_{day}{month}{year}.pkl','wb')
+f = open(f'{data_folder}/hprParameter_AIC_{add_tag}_sp_{rad_diff}_{day}{month}{year}.pkl','wb')
 pickle.dump(hprParams,f)
 f.close()
