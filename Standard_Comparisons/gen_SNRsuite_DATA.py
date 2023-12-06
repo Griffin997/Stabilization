@@ -39,7 +39,7 @@ T12 = 1200
 c1 = 0.4
 c2 = 0.6 
 T21 = 40
-T22 = 100
+T22 = 60
 
 true_params = np.array([T11, T12, c1, c2, T21, T22])
 
@@ -55,7 +55,7 @@ TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
 
 #SNR Values to Evaluate
-SNR_values = np.arange(55,100,5)
+SNR_values = np.arange(50,150,5)
 
 var_reps = 1000
 
@@ -90,7 +90,8 @@ year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),40])
 data_path = "Standard_Comparisons/Comparison_DATA"
-data_tag = (f"SNRsuite_{day}{month}{year}")
+add_tag = "illT2_"
+data_tag = (f"SNRsuite_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
 
@@ -477,6 +478,6 @@ hprParams = {
     'multi_start': multi_starts_obj
 }
 
-f = open(f'{data_folder}/hprParameter_AIC_SNRsuite_{day}{month}{year}.pkl','wb')
+f = open(f'{data_folder}/hprParameter_AIC_SNRsuite_{add_tag}{day}{month}{year}.pkl','wb')
 pickle.dump(hprParams,f)
 f.close()
