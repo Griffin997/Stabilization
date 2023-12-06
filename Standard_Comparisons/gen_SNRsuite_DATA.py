@@ -35,11 +35,11 @@ randStart = True                  #Initial guess for parameter values in random 
 ######All Fixed parameters for code
 #Parameters held constant
 T11 = 600
-T12 = 1200
+T12 = 800
 c1 = 0.4
 c2 = 0.6 
 T21 = 40
-T22 = 60
+T22 = 100
 
 true_params = np.array([T11, T12, c1, c2, T21, T22])
 
@@ -90,7 +90,7 @@ year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),40])
 data_path = "Standard_Comparisons/Comparison_DATA"
-add_tag = "illT2_"
+add_tag = "illT1_"
 data_tag = (f"SNRsuite_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
