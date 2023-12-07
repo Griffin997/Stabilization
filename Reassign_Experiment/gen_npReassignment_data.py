@@ -106,7 +106,7 @@ month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),50])
-data_path = "Known_Exponentiality_Experiment/Reassign_DATA"
+data_path = "Reassign_Experiment/Reassign_DATA"
 add_tag = "standard"
 data_tag = (f"reassignExp_AIC_{add_tag}_SNR_{SNR_value}_{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
