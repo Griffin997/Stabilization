@@ -60,7 +60,7 @@ index_TI2star = np.argmin((TI_STANDARD - TI2star)**2)
 
 
 Exp_STANDARD = np.zeros(len(TI_STANDARD))
-Exp_NP = np.zeros(len(TI_NP))
+Exp_NP = np.zeros(len(TI_STANDARD))
 Exp_NP[index_TI1star] = 1
 Exp_NP[index_TI2star] = 1
 
@@ -106,9 +106,9 @@ month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),50])
-data_path = "Known_Exponentiality_Experiment/Reassign_DATA"
-add_tag = "standard_"
-data_tag = (f"Window2D_AIC_{add_tag}_SNR_{SNR_value}_{day}{month}{year}")
+data_path = "Reassign_Experiment/Reassign_DATA"
+add_tag = "standard"
+data_tag = (f"reassignExp_AIC_{add_tag}_SNR_{SNR_value}_{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
 
@@ -453,6 +453,6 @@ hprParams = {
     'multi_start': multi_starts_obj
 }
 
-f = open(f'{data_folder}/hprParameter_AIC_SNR_{add_tag}_{SNR_value}_{day}{month}{year}.pkl','wb')
+f = open(f'{data_folder}/hprParameter_AIC_{add_tag}_SNR_{SNR_value}_{day}{month}{year}.pkl','wb')
 pickle.dump(hprParams,f)
 f.close()
