@@ -453,6 +453,6 @@ hprParams = {
     'multi_start': multi_starts_obj
 }
 
-f = open(f'{data_folder}/hprParameter_AIC_SNR_{add_tag}_{SNR_value}_{day}{month}{year}.pkl','wb')
+f = open(f'{data_folder}/hprParameter_AIC_{add_tag}_SNR_{SNR_value}_{day}{month}{year}.pkl','wb')
 pickle.dump(hprParams,f)
 f.close()
