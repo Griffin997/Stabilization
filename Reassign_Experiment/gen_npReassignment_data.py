@@ -39,7 +39,7 @@ T12 = 1200
 c1 = 0.4
 c2 = 0.6 
 T21 = 40
-T22 = 100
+T22 = 60
 
 true_params = np.array([T11, T12, c1, c2, T21, T22])
 
@@ -70,10 +70,10 @@ Exp_label_NP = [curve_options[int(elem)] for elem in Exp_NP]
 Exp_label_STANDARD = [curve_options[int(elem)] for elem in Exp_STANDARD]
 
 #Adjusting how the window center varies
-np1_range = 50
-np2_range = 50
-np1_num = 25
-np2_num = 25
+np1_range = TI1star*0.35//1
+np2_range = TI2star*0.35//1
+np1_num = 35
+np2_num = 35
 
 np1_array = np.linspace(-1*np1_range, np1_range, np1_num)//1
 np2_array = np.linspace(-1*np2_range, np2_range, np2_num)//1
@@ -107,7 +107,7 @@ year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),50])
 data_path = "Reassign_Experiment/Reassign_DATA"
-add_tag = "standard"
+add_tag = "illT2_large"
 data_tag = (f"reassignExp_AIC_{add_tag}_SNR_{SNR_value}_{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
@@ -368,7 +368,7 @@ def generate_all_estimates(i_param_combo):
 
     feature_df = pd.DataFrame(columns = ["NP1","NP2","SNR_eTime","TI_DATA","MSE", "Var", "bias", "pEst_AIC", "pEst_cf"])
 
-    feature_df["NP1"] = [np_diff2]
+    feature_df["NP1"] = [np_diff1]
     feature_df["NP2"] = [np_diff2]
     feature_df["TI_DATA"] = [TI_NP]
     feature_df["SNR_eTime"] = [SNR_eTime]
