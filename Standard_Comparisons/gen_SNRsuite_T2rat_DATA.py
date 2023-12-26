@@ -35,7 +35,7 @@ randStart = True                  #Initial guess for parameter values in random 
 ######All Fixed parameters for code
 #Parameters held constant
 T11 = 600
-T12 = 800
+T12 = 1200
 c1 = 0.4
 c2 = 0.6 
 T21 = 40
