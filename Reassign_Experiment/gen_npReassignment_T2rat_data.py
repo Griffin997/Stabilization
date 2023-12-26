@@ -84,10 +84,7 @@ var_reps = 1000
 if randStart:
     multi_starts_obj = 2
 else:
-    multi_starts_obj = 1
-
-#number of iterations to evaluate consistency of AIC filter
-AIC_eval_iter = 100     
+    multi_starts_obj = 1 
 
 target_iterator = [(a,b,c,d) for a in np1_array for b in np2_array for c in T2rat_array for d in SNR_array]
 
@@ -363,7 +360,7 @@ def generate_all_estimates(i_param_combo):
     TI_NP[index_TI1star] = (np.floor(TI1star) + np_diff1)//1
     TI_NP[index_TI2star] = (np.floor(TI2star) + np_diff2)//1
     T22_temp = T21*T2_rat
-    full_params = np.concatenate(true_params,T22_temp)
+    full_params = np.append(true_params,[T22_temp])
     
 
     SNR_eTime = SNR_value*(np.sum(TI_STANDARD)/np.sum(TI_NP))**(1/2)
