@@ -58,7 +58,7 @@ TI2star = np.log(2)*T12
 T2rat_array = np.arange(1.5, 2.51, 0.1)
 
 #SNR Values to Evaluate
-SNR_array = 10**np.linspace(np.log10(25), np.log10(250), 10)
+SNR_array = 10**np.linspace(np.log10(25), np.log10(250), 15)
 
 var_reps = 1000
 
