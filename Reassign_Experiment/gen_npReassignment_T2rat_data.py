@@ -70,14 +70,14 @@ Exp_label_NP = [curve_options[int(elem)] for elem in Exp_NP]
 Exp_label_STANDARD = [curve_options[int(elem)] for elem in Exp_STANDARD]
 
 #Adjusting how the window center varies
-np1_array = TI1star*np.array([-.125, -0.1, -0.075, -0.05, -0.025, 0, 0.025, 0.05, 0.075, 0.1, 0.125])//1
-np2_array = TI2star*np.array([-.125, -0.1, -0.075,-0.05, -0.025, 0, 0.025, 0.05, 0.075, 0.1, 0.125])//1
+np1_array = TI1star*np.array([-.15, -.125, -0.1, -0.075, -0.05, -0.025, 0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15])//1
+np2_array = TI2star*np.array([-.15, -.125, -0.1, -0.075, -0.05, -0.025, 0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15])//1
 
 #Adjusting the ratio of T21 and T22
-T2rat_array = np.arange(1.5, 2.51, 0.1)
+T2rat_array = [2.5]#np.arange(1.5, 2.51, 0.1)
 
 #SNR Values to Evaluate
-SNR_array = 10**np.linspace(np.log10(25), np.log10(250), 15)
+SNR_array = [100]#10**np.linspace(np.log10(25), np.log10(250), 15)
 
 var_reps = 1000
 
