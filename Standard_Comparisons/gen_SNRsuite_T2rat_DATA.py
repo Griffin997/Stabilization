@@ -55,10 +55,10 @@ TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
 
 #Adjusting the ratio of T21 and T22
-T2rat_array = np.arange(1.5, 2.51, 0.1)
+T2rat_array = [2.5]#np.arange(1.5, 2.51, 0.1)
 
 #SNR Values to Evaluate
-SNR_array = 10**np.linspace(np.log10(25), np.log10(250), 15)
+SNR_array = [100]#10**np.linspace(np.log10(25), np.log10(250), 15)
 
 var_reps = 1000
 
