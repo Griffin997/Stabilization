@@ -35,7 +35,7 @@ randStart = True                  #Initial guess for parameter values in random 
 ######All Fixed parameters for code
 #Parameters held constant
 T11 = 600
-T12 = 800
+T12 = 1200
 c1 = 0.4
 c2 = 0.6 
 T21 = 40
@@ -51,8 +51,9 @@ TE_DATA = np.linspace(TE_step, TE_step*n_TE, n_TE) #ms units
 
 TI_low = 250
 TI_high = 1050
+TI_res = 0.5
 
-TI_DATA = np.arange(TI_low,TI_high+1,1)
+TI_DATA = np.arange(TI_low,TI_high+TI_res,TI_res)
 
 TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
@@ -61,7 +62,7 @@ assert(TI_low < TI1star and TI1star < TI_high)
 assert(TI_low < TI2star and TI2star < TI_high)
 
 #SNR Values to Evaluate
-SNR_value = 100
+SNR_value = 500
 
 #Number of noisy realizations
 var_reps = 1000
@@ -79,16 +80,16 @@ num_cpus_avail = np.min([len(target_iterator),40])
 data_path = "InversionExp_Characteristics/MC_DATA"
 add_tag = ""
 data_head = "trueStart"
-data_tag = (f"{data_head}_{add_tag}{day}{month}{year}")
+data_tag = (f"{data_head}_SNR{SNR_value}_iter{var_reps}_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
 
 ############# Functions ##############
 
 #### Signaling Functions
-def S_biX_6p(TE, T11, T12, c1, c2, T21, T22, TI = 0):
-    exp1 = c1*(1-2*np.exp(-TI/T11))*np.exp(-TE/T21)
-    exp2 = c2*(1-2*np.exp(-TI/T12))*np.exp(-TE/T22)
+def S_biX_6p(TE, T11, T12, c1, c2, T21, T22, TI_val = 0):
+    exp1 = c1*(1-2*np.exp(-TI_val/T11))*np.exp(-TE/T21)
+    exp2 = c2*(1-2*np.exp(-TI_val/T12))*np.exp(-TE/T22)
     return exp1 + exp2
 
 #The one dimensional models 
@@ -155,10 +156,14 @@ def check_param_order(popt):
 
 def estP_oneCurve(func, TI_val, noisey_data):
 
+    f_name = func.__name__
     init_p = set_p0(func, TI = TI_val)
     lb, ub = get_func_bounds(func)
 
-    popt, _, info_popt, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
+    if f_name.find("6p") > -1:
+        popt, _, info_popt, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
+    else:
+        popt, _, info_popt, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
     popt = check_param_order(popt)
     RSS = np.sum(info_popt['fvec']**2)
 
@@ -171,12 +176,13 @@ def generate_all_estimates(i_param_combo):
     #noise realizations, SNR values, and lambdas of interest
     TI_value, nr = target_iterator[i_param_combo]
 
-    feature_df = pd.DataFrame(columns = ["TI","TD_params","OD_params", "TD_RSS", "OD_RSS"])
+    feature_df = pd.DataFrame(columns = ["TI","NR","TD_params","OD_params", "TD_RSS", "OD_RSS"])
 
     feature_df["TI"] = [TI_value]
+    feature_df["NR"] = [nr]
 
     #Generate signal array from temp values
-    true_signal = S_biX_6p(TE_DATA, *true_params, TI = TI_value)
+    true_signal = S_biX_6p(TE_DATA, *true_params, TI_val = TI_value)
     noised_signal = add_noise(true_signal, SNR_value)
 
     param_6p, RSS_6p = estP_oneCurve(S_biX_6p, TI_value, noised_signal)
@@ -229,6 +235,6 @@ hprParams = {
     "var_reps": var_reps,
 }
 
-f = open(f'{data_folder}/hprParameter_{data_head}_{add_tag}{day}{month}{year}.pkl','wb')
+f = open(f'{data_folder}/hprParameter_{data_head}_SNR{SNR_value}_iter{var_reps}_{add_tag}{day}{month}{year}.pkl','wb')
 pickle.dump(hprParams,f)
 f.close()
