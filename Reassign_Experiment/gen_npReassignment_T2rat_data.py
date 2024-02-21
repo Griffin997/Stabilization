@@ -74,10 +74,10 @@ np1_array = TI1star*np.array([-.15, -.125, -0.1, -0.075, -0.05, -0.025, 0, 0.025
 np2_array = TI2star*np.array([-.15, -.125, -0.1, -0.075, -0.05, -0.025, 0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15])//1
 
 #Adjusting the ratio of T21 and T22
-T2rat_array = [2.5]#np.arange(1.5, 2.51, 0.1)
+T2rat_array = np.arange(1.5, 2.51, 0.1)
 
 #SNR Values to Evaluate
-SNR_array = [100]#10**np.linspace(np.log10(25), np.log10(250), 15)
+SNR_array = [25,35,50,75,100,150,250,500]#10**np.linspace(np.log10(25), np.log10(250), 15)
 
 var_reps = 1000
 
@@ -154,16 +154,16 @@ def add_noise(data, SNR):
 def get_func_bounds(func):
     f_name = func.__name__
     if f_name == "S_biX_6p":
-        lower_bound = (2, 2, 0, 0, 2, 2)
+        lower_bound = (0, 0, 0, 0, 0, 0)
         upper_bound = (2000, 2000, 1, 1, 150, 150)
     elif f_name == "S_moX_3p":
-        lower_bound = (2, 0, 2)
+        lower_bound = (0, 0, 0)
         upper_bound = (2000, 1, 150)
     elif f_name == "S_biX_4p":
-        lower_bound = (-1, -1, 2, 2)
+        lower_bound = (-1, -1, 0, 0)
         upper_bound = (1, 1, 150, 150)
     elif f_name == "S_moX_2p":
-        lower_bound = (-1, 2)
+        lower_bound = (-1, 0)
         upper_bound = (1, 150)
     else:
         raise Exception("Not a valid function: " + f_name)
