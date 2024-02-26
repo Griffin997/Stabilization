@@ -154,16 +154,16 @@ def add_noise(data, SNR):
 def get_func_bounds(func):
     f_name = func.__name__
     if f_name == "S_biX_6p":
-        lower_bound = (0, 0, 0, 0, 0, 0)
+        lower_bound = (1, 1, 0, 0, 1, 1)
         upper_bound = (2000, 2000, 1, 1, 150, 150)
     elif f_name == "S_moX_3p":
-        lower_bound = (0, 0, 0)
+        lower_bound = (1, 0, 1)
         upper_bound = (2000, 1, 150)
     elif f_name == "S_biX_4p":
-        lower_bound = (-1, -1, 0, 0)
+        lower_bound = (-1, -1, 1, 1)
         upper_bound = (1, 1, 150, 150)
     elif f_name == "S_moX_2p":
-        lower_bound = (-1, 0)
+        lower_bound = (-1, 1)
         upper_bound = (1, 150)
     else:
         raise Exception("Not a valid function: " + f_name)
