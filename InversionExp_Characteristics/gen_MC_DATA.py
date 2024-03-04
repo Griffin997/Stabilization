@@ -65,7 +65,7 @@ assert(TI_low < TI2star and TI2star < TI_high)
 SNR_value = 500
 
 #Number of noisy realizations
-var_reps = 1000
+var_reps = 10000
 
 #Number of tasks to execute
 target_iterator = [(a,b) for a in TI_DATA for b in range(var_reps)]
