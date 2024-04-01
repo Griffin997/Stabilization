@@ -28,7 +28,8 @@ sys.path.append(parent)
 import functools
 
 ####### Options #######
-randStart = True                  #Initial guess for parameter values in random locations
+randStart = False                  #Initial guess for parameter values in random locations
+bounded = True
 
 ############# Global Params ###############
 
@@ -62,7 +63,7 @@ SNR_value = 1000
 var_reps = 100000
 
 #Number of multi starts
-multi_starts = 5
+multi_starts = 1
 
 #Number of tasks to execute
 target_iterator = [(a,b) for a in TI_DATA for b in range(var_reps//2)]
@@ -76,7 +77,7 @@ year = date.strftime('%y')
 num_cpus_avail = np.min([len(target_iterator),40])
 data_path = "InversionExp_Characteristics/TDA_freq_DATA"
 add_tag = ""
-data_head = "splitStart"
+data_head = "trueStart"
 data_tag = (f"{data_head}_SNR{SNR_value}_iter{var_reps}_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
@@ -159,17 +160,28 @@ def set_p0(func, TI = 0):
 def estP_oneCurve(func, TI_val, noisey_data):
 
     f_name = func.__name__
-    init_p = set_p0(func, TI = TI_val)
-    init_p_inv = flip_order(init_p)
+    init_p = [d_value(TI_val,c1,T11), d_value(TI_val,c2,T12), T21, T22]
+    init_p_inv = [d_value(TI_val,c1,T11), d_value(TI_val,c2,T12), T22, T21]
     lb, ub = get_func_bounds(func)
 
-    if f_name.find("6p") > -1:
-        popt_one, _, info_popt_one, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
-        popt_two, _, info_popt_two, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p_inv, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
-    
+    if bounded:
+        if f_name.find("6p") > -1:
+            popt_one, _, info_popt_one, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
+            popt_two, _, info_popt_two, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p_inv, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
+        
+        else:
+            popt_one, _, info_popt_one, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
+            popt_two, _, info_popt_two, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p_inv, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
     else:
-        popt_one, _, info_popt_one, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
-        popt_two, _, info_popt_two, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p_inv, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
+        if f_name.find("6p") > -1:
+            popt_one, _, info_popt_one, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p, maxfev = 1500, full_output = True)
+            popt_two, _, info_popt_two, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p_inv, maxfev = 1500, full_output = True)
+        
+        else:
+            popt_one, _, info_popt_one, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p, maxfev = 1500, full_output = True)
+            popt_two, _, info_popt_two, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p_inv, maxfev = 1500, full_output = True)
+
+    
     RSS_one = np.sum(info_popt_one['fvec']**2)
     RSS_two = np.sum(info_popt_two['fvec']**2)
 
@@ -193,8 +205,6 @@ def generate_all_estimates(i_param_combo):
 
     RSS1_best = np.inf
     RSS2_best = np.inf
-    params1_best = np.zeros(4)
-    params2_best = np.zeros(4)
     for iMS in range(multi_starts):
         param1_temp, RSS1_temp, param2_temp, RSS2_temp = estP_oneCurve(S_biX_4p, TI_value, noised_signal)
     
