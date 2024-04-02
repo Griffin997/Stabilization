@@ -75,7 +75,7 @@ month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),40])
-data_path = "InversionExp_Characteristics/TDA_freq_DATA"
+data_path = "TDA/TDA_freq_DATA"
 add_tag = ""
 data_head = "trueStart"
 data_tag = (f"{data_head}_SNR{SNR_value}_iter{var_reps}_{add_tag}{day}{month}{year}")
