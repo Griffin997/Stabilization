@@ -51,7 +51,7 @@ TE_step = 8
 TE_DATA = np.linspace(TE_step, TE_step*n_TE, n_TE) #ms units
 
 
-TI_DATA = [200, 300, 400, 500, 600, 700, 800, 900]
+TI_DATA = sorted(list(range(208, 1000, 16)))#[200, 300, 400, 500, 600, 700, 800, 900]
 
 TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
@@ -60,7 +60,7 @@ TI2star = np.log(2)*T12
 SNR_value = 1000
 
 #Number of noisy realizations
-var_reps = 100000
+var_reps = 5000
 
 #Number of multi starts
 multi_starts = 1
