@@ -108,11 +108,11 @@ def add_noise(data, SNR):
     return noised_data
 
 def flip_order(popt):
+    p_flip = np.zeros(len(popt))
     for pi in range(np.size(popt)//2):
-        p_hold = popt[2*pi]
-        popt[2*pi] = popt[2*pi+1]
-        popt[2*pi+1] = p_hold
-    return popt
+        p_flip[2*pi] = popt[2*pi+1]
+        p_flip[2*pi+1] = popt[2*pi]
+    return p_flip
 
 #### Fitting helping functions
 
@@ -160,8 +160,8 @@ def set_p0(func, TI = 0):
 def estP_oneCurve(func, TI_val, noisey_data):
 
     f_name = func.__name__
-    init_p = [d_value(TI_val,c1,T11), d_value(TI_val,c2,T12), T21, T22]
-    init_p_inv = [d_value(TI_val,c1,T11), d_value(TI_val,c2,T12), T22, T21]
+    init_p = set_p0(func, TI = TI_val)
+    init_p_inv = flip_order(init_p)
     lb, ub = get_func_bounds(func)
 
     if bounded:
