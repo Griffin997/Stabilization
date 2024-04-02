@@ -71,7 +71,7 @@ class Data:
 
     def save_data(self, filename: str = None):
         if filename == None:
-            filename = "data(" + str(self.bin_size) + "," + str(self.thresh) + ");" + self.TItitle + ";" + str(self.n_iters) + ";" + str(self.sample_size) + ";" + str(self.SNR) + ".npy"
+            filename = "MH_DATA\\data(" + str(self.bin_size) + "," + str(self.thresh) + ");" + self.TItitle + ";" + str(self.n_iters) + ";" + str(self.sample_size) + ";" + str(self.SNR) + ".npy"
         np.save(filename, self.data)
 
     def load_data(self, filename: str = None):
