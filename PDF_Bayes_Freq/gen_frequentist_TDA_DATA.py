@@ -60,7 +60,7 @@ TI2star = np.log(2)*T12
 SNR_value = 1000
 
 #Number of noisy realizations
-var_reps = 5000
+var_reps = 10000
 
 #Number of multi starts
 multi_starts = 1
@@ -77,7 +77,7 @@ year = date.strftime('%y')
 num_cpus_avail = np.min([len(target_iterator),40])
 data_path = "PDF_Bayes_Freq/TDA_freq_DATA"
 add_tag = ""
-data_head = "trueStart"
+data_head = "manyTI"
 data_tag = (f"{data_head}_SNR{SNR_value}_iter{var_reps}_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
