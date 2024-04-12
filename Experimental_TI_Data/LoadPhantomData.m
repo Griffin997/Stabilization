@@ -1,7 +1,7 @@
 %%
 
-f1D=fopen('Data/2dseq','r');
-data_mag_1D =fread(f1D,'int16');
+f1D=fopen('2dseq','r');
+data_mag_1D =fopen(f1D,'int16');
 fclose(f1D);
 
 repetitions = 100;
@@ -24,7 +24,7 @@ xlim([0,200])
 
 %%
 
-f1D=fopen('Data/ser','r');
+f1D=fopen('ser','r');
 data_C_2D=fread(f1D,[2,13107200],'int32');
 fclose(f1D);
 
@@ -89,7 +89,7 @@ title("Phased")
 
 signal_dataset = real(unphased_dataset);
 
-save("Data/signal_dataset.mat",'signal_dataset')
+% save("Data/signal_dataset.mat",'signal_dataset')
 
 avg_signal = mean(signal_dataset,3);
 

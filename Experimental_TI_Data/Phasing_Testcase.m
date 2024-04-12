@@ -3,41 +3,45 @@ clear
 close all
 
 %% Loading in TI values
-TI_vals = importdata('Data/TI_phantom_nullExp.txt');
+TI_vals = importdata('TI_phantom_nullExp.txt');
 
 %% Phasing with more accurate phase shift values
 
-f1D=fopen('Data/ser','r');
+f1D=fopen('ser','r');
 data_C_2D=fread(f1D,[2,13107200],'int32');
 fclose(f1D);
 
 data_C_1D = complex(data_C_2D(1,:), data_C_2D(2,:));
 
-TI_index = 55;
-TI_oi = 64-TI_index+1;
+TI_index = 1;
 
 repetitions = 100;
 nTIs = 64;
 nTEs = 2048;
+
+rep_oi = 1;
 
 TE_array = (1:1:2048)*0.4;
 TE_array = TE_array(1:2048/2);
 
 unphased_dataset = reshape(data_C_1D, nTEs, nTIs, repetitions);
 unphased_dataset = unphased_dataset(1:2048/2,:,:);
-one_signal = unphased_dataset(:,TI_oi,25);
+%Removing the first noise realization at every combo - shows TR
+%interactions
+unphased_dataset = unphased_dataset(:,:,2:end);
+one_signal = unphased_dataset(:,TI_index,rep_oi);
 TI_signal_used = TI_vals(TI_index);
 first_point = one_signal(1);
 
-square_signal = real(one_signal).^2 + imag(one_signal).^2;
+square_signal = sqrt(real(one_signal).^2 + imag(one_signal).^2);
 figure;
 plot(TE_array, square_signal)
 title("Magnitudes")
 
-theta = atan(imag(first_point)/real(first_point))
+theta = atan(imag(first_point)/real(first_point));
 angles = imag(one_signal)./real(one_signal);
 
-one_signal(1:20)
+one_signal(1:20);
 
 figure;
 plot(angles)
@@ -74,6 +78,7 @@ subplot(2,2,4)
 plot(TE_array, imag(phased_data));
 title('Imaginary Phased Data - Rep 1')
 xlabel('Echo (ms)')
+sgtitle(strcat("TI  = ", string(TI_vals(TI_index)*1000), " ms"))
 
 %% Workspace
 
@@ -83,6 +88,7 @@ grid on
 xlabel('Real')
 ylabel('Imaginary')
 title(string(TI_vals(TI_index)))
+sgtitle(strcat("TI  = ", string(TI_vals(TI_index)*1000), " ms"))
 
 %%
 
@@ -111,3 +117,5 @@ xlim([350,400])
 ylabel('Signed Ratio :: Real/Imag')
 ylim([-2,2])
 title(strcat("Ratio :: ", string(TI_vals(TI_index))))
+
+sgtitle(strcat("TI  = ", string(TI_vals(TI_index)*1000), " ms"))
