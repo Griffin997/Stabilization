@@ -51,7 +51,7 @@ TE_step = 8
 TE_DATA = np.linspace(TE_step, TE_step*n_TE, n_TE) #ms units
 
 
-TI_DATA = sorted(list(range(208, 1000, 16)))#[200, 300, 400, 500, 600, 700, 800, 900]
+TI_DATA = [200, 300, 400, 500, 600, 700, 800, 900]#sorted(list(range(208, 1000, 16)))#
 
 TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
@@ -60,7 +60,7 @@ TI2star = np.log(2)*T12
 SNR_value = 1000
 
 #Number of noisy realizations
-var_reps = 10000
+var_reps = 1000000
 
 #Number of multi starts
 multi_starts = 1
@@ -77,7 +77,7 @@ year = date.strftime('%y')
 num_cpus_avail = np.min([len(target_iterator),40])
 data_path = "PDF_Bayes_Freq/TDA_freq_DATA"
 add_tag = ""
-data_head = "manyTI"
+data_head = "trueStart"
 data_tag = (f"{data_head}_SNR{SNR_value}_iter{var_reps}_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
@@ -120,10 +120,10 @@ def get_func_bounds(func):
     f_name = func.__name__
     if f_name.find("6p") > -1:
         lower_bound = (0, 0, 0, 0, 0, 0)
-        upper_bound = (2000, 2000, 1, 1, 150, 150)
+        upper_bound = (2000, 2000, 1, 1, 300, 300)
     elif f_name.find("4p") > -1:
         lower_bound = (-1, -1, 0, 0)
-        upper_bound = (1, 1, 150, 150)
+        upper_bound = (1, 1, 300, 300)
     else:
         raise Exception("Not a valid function: " + f_name)
 
@@ -166,20 +166,20 @@ def estP_oneCurve(func, TI_val, noisey_data):
 
     if bounded:
         if f_name.find("6p") > -1:
-            popt_one, _, info_popt_one, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
-            popt_two, _, info_popt_two, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p_inv, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
+            popt_one, _, info_popt_one, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 4000, full_output = True)
+            popt_two, _, info_popt_two, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p_inv, bounds = [lb,ub], method = 'trf', maxfev = 4000, full_output = True)
         
         else:
-            popt_one, _, info_popt_one, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
-            popt_two, _, info_popt_two, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p_inv, bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output = True)
+            popt_one, _, info_popt_one, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p, bounds = [lb,ub], method = 'trf', maxfev = 4000, full_output = True)
+            popt_two, _, info_popt_two, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p_inv, bounds = [lb,ub], method = 'trf', maxfev = 4000, full_output = True)
     else:
         if f_name.find("6p") > -1:
-            popt_one, _, info_popt_one, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p, maxfev = 1500, full_output = True)
-            popt_two, _, info_popt_two, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p_inv, maxfev = 1500, full_output = True)
+            popt_one, _, info_popt_one, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p, maxfev = 4000, full_output = True)
+            popt_two, _, info_popt_two, _, _ = curve_fit(functools.partial(func, TI_val = TI_val), TE_DATA, noisey_data, p0 = init_p_inv, maxfev = 4000, full_output = True)
         
         else:
-            popt_one, _, info_popt_one, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p, maxfev = 1500, full_output = True)
-            popt_two, _, info_popt_two, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p_inv, maxfev = 1500, full_output = True)
+            popt_one, _, info_popt_one, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p, maxfev = 4000, full_output = True)
+            popt_two, _, info_popt_two, _, _ = curve_fit(func, TE_DATA, noisey_data, p0 = init_p_inv, maxfev = 4000, full_output = True)
 
     
     RSS_one = np.sum(info_popt_one['fvec']**2)
