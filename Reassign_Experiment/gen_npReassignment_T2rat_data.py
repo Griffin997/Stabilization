@@ -363,7 +363,7 @@ def generate_all_estimates(i_param_combo):
     full_params = np.append(true_params,[T22_temp])
     
 
-    SNR_eTime = SNR_value*(np.sum(TI_STANDARD)/np.sum(TI_NP))**(1/2)
+    SNR_eTime = SNR_value*(np.sum(TI_STANDARD)/np.sum(TI_NP))**(2)
 
     feature_df = pd.DataFrame(columns = ["NP1","NP2","T2_rat", "SNR", "SNR_eTime","TI_DATA","MSE", "Var", "bias", "pEst_AIC", "pEst_cf"])
 
