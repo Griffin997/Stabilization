@@ -29,7 +29,7 @@ import functools
 
 ####### Options #######
 randStart = False                  #Initial guess for parameter values in random locations
-bounded = True
+bounded = False
 
 ############# Global Params ###############
 
@@ -51,7 +51,7 @@ TE_step = 8
 TE_DATA = np.linspace(TE_step, TE_step*n_TE, n_TE) #ms units
 
 
-TI_DATA = [200, 300, 400, 500, 600, 700, 800, 900]#sorted(list(range(208, 1000, 16)))#
+TI_DATA = [200, 300, 350, 400, 416, 450, 500, 550, 600, 650, 700, 750, 800, 832, 900, 1000]#sorted(list(range(208, 1000, 16)))#
 
 TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
@@ -201,21 +201,28 @@ def generate_all_estimates(i_param_combo):
 
     #Generate signal array from temp values
     true_signal = S_biX_6p(TE_DATA, *true_params, TI_val = TI_value)
-    noised_signal = add_noise(true_signal, SNR_value)
 
-    RSS1_best = np.inf
-    RSS2_best = np.inf
-    for iMS in range(multi_starts):
-        param1_temp, RSS1_temp, param2_temp, RSS2_temp = estP_oneCurve(S_biX_4p, TI_value, noised_signal)
-    
-        if RSS1_temp < RSS1_best:
-            RSS1_best = RSS1_best
-            param1_best = param1_temp
+    params_found = False
+    while not params_found:
+        try:
+            noised_signal = add_noise(true_signal, SNR_value)
 
-        if RSS2_temp < RSS2_best:
-            RSS2_best = RSS2_best
-            param2_best = param2_temp
+            RSS1_best = np.inf
+            RSS2_best = np.inf
+            for iMS in range(multi_starts):
+                param1_temp, RSS1_temp, param2_temp, RSS2_temp = estP_oneCurve(S_biX_4p, TI_value, noised_signal)
+            
+                if RSS1_temp < RSS1_best:
+                    RSS1_best = RSS1_best
+                    param1_best = param1_temp
 
+                if RSS2_temp < RSS2_best:
+                    RSS2_best = RSS2_best
+                    param2_best = param2_temp
+
+            params_found = True
+        except:
+            params_found = False
 
 
     feature_df['params1'] = [param1_best]
