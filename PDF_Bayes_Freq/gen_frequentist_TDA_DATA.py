@@ -51,7 +51,7 @@ TE_step = 8
 TE_DATA = np.linspace(TE_step, TE_step*n_TE, n_TE) #ms units
 
 
-TI_DATA = [200, 300, 350, 400, 416, 450, 500, 550, 600, 650, 700, 750, 800, 832, 900, 1000]#sorted(list(range(208, 1000, 16)))#
+TI_DATA = sorted(list(range(208, 1000, 16)))#[200, 300, 350, 400, 416, 450, 500, 550, 600, 650, 700, 750, 800, 832, 900, 1000]#sorted(list(range(208, 1000, 16)))#
 
 TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
@@ -60,7 +60,7 @@ TI2star = np.log(2)*T12
 SNR_value = 1000
 
 #Number of noisy realizations
-var_reps = 1000000
+var_reps = 2000000
 
 #Number of multi starts
 multi_starts = 1
@@ -77,7 +77,7 @@ year = date.strftime('%y')
 num_cpus_avail = np.min([len(target_iterator),40])
 data_path = "PDF_Bayes_Freq/TDA_freq_DATA"
 add_tag = ""
-data_head = "trueStart"
+data_head = "manyTI_unbounded_"
 data_tag = (f"{data_head}_SNR{SNR_value}_iter{var_reps}_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
