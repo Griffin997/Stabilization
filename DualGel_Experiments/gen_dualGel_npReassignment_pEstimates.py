@@ -28,6 +28,7 @@ sys.path.append(parent)
 import functools
 
 cwd = os.getcwd()
+experiment_folder = "DualGel_Experiments"
 
 ####### Options #######
 randStart = True                  #Initial guess for parameter values in random locations
@@ -36,7 +37,7 @@ run_number = 78
 
 file_oi = f"real_phased_run{run_number}" #imag_unphased_dataset    real_unphased_dataset   real_phased_dataset
 
-raw = scipy.io.loadmat(f'{cwd}/{file_oi}.mat')
+raw = scipy.io.loadmat(f'{cwd}/{experiment_folder}/{file_oi}.mat')
 raw_data = raw['real_phased_dataset']
 
 ############# Global Params ###############
@@ -63,7 +64,7 @@ assert(index_TI1star == 6)
 index_TI2star = np.argmin((TI_STANDARD - TI2star)**2)
 assert(index_TI2star == 8)
 
-with open(f'{cwd}\\dualGel_TI.txt') as f:
+with open(f'{cwd}/{experiment_folder}/dualGel_TI.txt') as f:
     TI = f.readlines()
 TI_DATA = [int(sub.replace("\n", "")) for sub in TI]
 
@@ -78,7 +79,7 @@ TI1g_indices = np.arange(TI_STANDARD_indices[5]+1,TI_STANDARD_indices[7],1)
 ### For TI2star we have 15% boundaries with sampling at every 1 ms
 ### This results in 75 points - we use every third point for 25 points total
 TI2g_indices = np.arange(TI_STANDARD_indices[7]+1,TI_STANDARD_indices[9],3)
-TI2g_indices.append(TI_STANDARD_indices[8])
+np.append(TI2g_indices,TI_STANDARD_indices[8])
 
 #This block identifies the moX indices with a one and all biX indices with a zero
 Exp_STANDARD = np.zeros(len(TI_STANDARD))
@@ -128,9 +129,10 @@ month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),60])
-data_path = "DualGel_Experiment/DG_Analysis_DATA"
+
+data_path = f"{experiment_folder}/DG_Analysis_DATA"
 add_tag = ""
-data_tag = (f"reassignExp_{add_tag}{day}{month}{year}")
+data_tag = (f"reassignExp_run{run_number}_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
 
@@ -493,6 +495,6 @@ hprParams = {
     'norm_factor': norm_factor
 }
 
-f = open(f'{data_folder}/hprParameter_AIC_{add_tag}_T2rat_SNRsuite_{day}{month}{year}.pkl','wb')
+f = open(f'{data_folder}/hprParameter_run{run_number}_{day}{month}{year}.pkl','wb')
 pickle.dump(hprParams,f)
 f.close()
