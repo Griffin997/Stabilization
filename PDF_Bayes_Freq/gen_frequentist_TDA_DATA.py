@@ -29,7 +29,7 @@ import functools
 
 ####### Options #######
 randStart = False                  #Initial guess for parameter values in random locations
-bounded = False
+bounded = True
 
 ############# Global Params ###############
 
@@ -60,7 +60,7 @@ TI2star = np.log(2)*T12
 SNR_value = 1000
 
 #Number of noisy realizations
-var_reps = 2000000
+var_reps = 100000
 
 #Number of multi starts
 multi_starts = 1
@@ -77,7 +77,7 @@ year = date.strftime('%y')
 num_cpus_avail = np.min([len(target_iterator),40])
 data_path = "PDF_Bayes_Freq/TDA_freq_DATA"
 add_tag = ""
-data_head = "manyTI_unbounded_"
+data_head = "manyTI"
 data_tag = (f"{data_head}_SNR{SNR_value}_iter{var_reps}_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
@@ -270,7 +270,8 @@ hprParams = {
     "dTE": TE_step,
     "var_reps": var_reps,
     "rand_start": randStart,
-    "multi_start": multi_starts
+    "multi_start": multi_starts,
+    "bounded": bounded
 }
 
 f = open(f'{data_folder}/hprParameter_{data_head}_SNR{SNR_value}_iter{var_reps}_{add_tag}{day}{month}{year}.pkl','wb')
