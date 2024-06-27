@@ -27,8 +27,17 @@ parent = os.path.dirname(os.path.abspath(''))
 sys.path.append(parent)
 import functools
 
+cwd = os.getcwd()
+
 ####### Options #######
 randStart = True                  #Initial guess for parameter values in random locations
+
+run_number = 78
+
+file_oi = f"real_phased_run{run_number}" #imag_unphased_dataset    real_unphased_dataset   real_phased_dataset
+
+raw = scipy.io.loadmat(f'{cwd}/{file_oi}.mat')
+raw_data = raw['real_phased_dataset']
 
 ############# Global Params ###############
 
@@ -41,8 +50,7 @@ T22 = 40.7 #+- 0.2 ms
 T12 = 353.3 #+- 12.6 ms
 c2 = 1 - c1
 
-
-true_params = np.array([T11, T12, c1, c2, T21])
+true_params = np.array([T11, T12, c1, c2, T21, T22])
 
 #Null Point Values
 TI1star = np.log(2)*T11
@@ -55,35 +63,57 @@ assert(index_TI1star == 6)
 index_TI2star = np.argmin((TI_STANDARD - TI2star)**2)
 assert(index_TI2star == 8)
 
+with open(f'{cwd}\\dualGel_TI.txt') as f:
+    TI = f.readlines()
+TI_DATA = [int(sub.replace("\n", "")) for sub in TI]
 
+assert(TI_DATA[0] < TI_DATA[-1])
+TE_DATA = np.arange(1,2048.1,1)*0.4 #ms
+
+TI_STANDARD_indices = [np.where(iTI == TI_DATA)[0][0] for iTI in TI_STANDARD]
+
+#These are the windows that we are going to be analyzing
+### For TI1star we have 15% boundaries with sampling at every 1 ms - we can use all 21 points
+TI1g_indices = np.arange(TI_STANDARD_indices[5]+1,TI_STANDARD_indices[7],1)
+### For TI2star we have 15% boundaries with sampling at every 1 ms
+### This results in 75 points - we use every third point for 25 points total
+TI2g_indices = np.arange(TI_STANDARD_indices[7]+1,TI_STANDARD_indices[9],3)
+TI2g_indices.append(TI_STANDARD_indices[8])
+
+#This block identifies the moX indices with a one and all biX indices with a zero
 Exp_STANDARD = np.zeros(len(TI_STANDARD))
 Exp_NP = np.zeros(len(TI_STANDARD))
 Exp_NP[index_TI1star] = 1
 Exp_NP[index_TI2star] = 1
 
-#This implies that a truth for evaluate is moX and a false is biX
+#This is where we label indices as moX or biX based on the previous block
 curve_options = ["BiX", "MoX"] 
 Exp_label_NP = [curve_options[int(elem)] for elem in Exp_NP]
 Exp_label_STANDARD = [curve_options[int(elem)] for elem in Exp_STANDARD]
 
-#Adjusting how the window center varies
-np1_array = TI1star*np.array([-.15, -.125, -0.1, -0.075, -0.05, -0.025, 0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15])//1
-np2_array = TI2star*np.array([-.15, -.125, -0.1, -0.075, -0.05, -0.025, 0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15])//1
+#Loading in the data
+sp = 2      #spacing of TE in terms of indices
+ext = 256   #number of TE points
 
-#Adjusting the ratio of T21 and T22
-T2rat_array = np.arange(1.5, 2.51, 0.1)
+#separate by spacing
+raw_data = raw_data[sp-1::sp,:,:]
+TE_DATA = TE_DATA[sp-1::sp]
+#limit number of points studied - removes unneeded tail - don't want to overfit to the baseline
+raw_data = raw_data[:ext,:,:]
+TE_DATA = TE_DATA[:ext]
 
-#SNR Values to Evaluate
-SNR_array = [25,35,50,75,100,150,250,500]#10**np.linspace(np.log10(25), np.log10(250), 15)
+#make sure all the data is here as we expect - this is important for indexing later
+assert(len(TI_DATA) == raw_data.shape[1])
 
-var_reps = 1000
+#number of noise realizations
+var_reps = raw_data.shape[-1]
 
 if randStart:
     multi_starts_obj = 2
 else:
     multi_starts_obj = 1 
 
-target_iterator = [(a,b,c,d) for a in np1_array for b in np2_array for c in T2rat_array for d in SNR_array]
+target_iterator = [(a,b) for a in TI1g_indices for b in TI2g_indices]
 
 #Builds a string of parameters to use in the titles
 ParamTitle_6p = [r'$T_{11}$', r'$T_{12}$', r'$c_1$', r'$c_2$', r'$T_{21}$', r'$T_{22}$']
@@ -98,9 +128,9 @@ month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),60])
-data_path = "Reassign_Experiment/Reassign_T2rat_DATA"
-add_tag = "standard"
-data_tag = (f"reassignExp_AIC_{add_tag}_T2rat_SNRsuite_{day}{month}{year}")
+data_path = "DualGel_Experiment/DG_Analysis_DATA"
+add_tag = ""
+data_tag = (f"reassignExp_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
 
@@ -224,6 +254,20 @@ def calculate_RSS(func, popt, data):
     
     return RSS
 
+def det_normFactor(noisy_curve):
+
+    lb = (0, 0, 0, 0)
+    ub = (np.inf, np.inf, 150, 150)
+
+    d_init = 0.5*noisy_curve[0]
+
+    popt, _, _, _, _ = curve_fit(S_biX_4p, TE_DATA, noisy_curve, p0 = (d_init, d_init, 30, 50), bounds = [lb,ub], method = 'trf', maxfev = 1500, full_output=True)
+
+    return popt[0]+popt[1]
+
+def d_value(TI,c,T1):
+    return c*(1-2*np.exp(-TI/T1))
+
 def estP_oneCurve(func, noisey_data):
 
     init_p = set_p0(func, random = True)
@@ -278,12 +322,10 @@ def RSS_obj_func(popt, data, TI_val, func):
 
 #### Metric
 
-def calc_MSE(paramStore, true_params, clipped = False):
+def calc_MSE(paramStore, true_params):
     varMat = np.var(paramStore, axis=0)
     biMat = np.mean(paramStore, axis = 0) - true_params  #E[p_hat] - p_true
     MSEMat = varMat + biMat**2
-    if clipped:
-        return MSEMat[-4:], biMat[-4:], varMat[-4:]
     return MSEMat, varMat, biMat
 
 
@@ -352,59 +394,58 @@ def estimate_parameters(popt, TI_DATA, noised_data, lb, ub, list_curve_X, list_c
 def generate_all_estimates(i_param_combo):
     #Generates a comprehensive matrix of all parameter estimates for all param combinations, 
     #noise realizations, SNR values, and lambdas of interest
-    np_diff1, np_diff2, T2_rat, SNR_value = target_iterator[i_param_combo]
-    TI_NP = np.append(0,np.logspace(1,np.log10(3*T12),11))//1
-    TI_NP[index_TI1star] = (np.floor(TI1star) + np_diff1)//1
-    TI_NP[index_TI2star] = (np.floor(TI2star) + np_diff2)//1
-    T22_temp = T21*T2_rat
-    full_params = np.append(true_params,[T22_temp])
-    
+    TI1ind, TI2ind = target_iterator[i_param_combo]
+    TI_NP = np.copy(TI_STANDARD)
+    temp_indices = np.copy(TI_STANDARD_indices)
+    temp_indices[index_TI1star] = TI1ind
+    temp_indices[index_TI2star] = TI2ind
+    TI_NP[index_TI1star] = TI_DATA[TI1ind]
+    TI_NP[index_TI2star] = TI_DATA[TI2ind]
 
-    SNR_eTime = SNR_value*(np.sum(TI_STANDARD)/np.sum(TI_NP))**(1/2)
+    feature_df = pd.DataFrame(columns = ["TI1*g","TI2*g","TI_DATA", "MSE", "Var", "bias", "pEst_cvn", "pEst_AIC", "pEst_cf"])
 
-    feature_df = pd.DataFrame(columns = ["NP1","NP2","T2_rat", "SNR", "SNR_eTime","TI_DATA","MSE", "Var", "bias", "pEst_AIC", "pEst_cf"])
-
-    feature_df["NP1"] = [np_diff1]
-    feature_df["NP2"] = [np_diff2]
-    feature_df["T2_rat"] = [T2_rat]
-    feature_df["SNR"] = [SNR_value]
+    feature_df["TI1*g"] = TI_DATA[TI1ind]
+    feature_df["TI2*g"] = TI_DATA[TI2ind]
     feature_df["TI_DATA"] = [TI_NP]
-    feature_df["SNR_eTime"] = [SNR_eTime]
 
-    signal_array = np.zeros([len(TI_NP), len(TE_DATA)])
+    signal_array = np.zeros([len(TI_NP), len(TE_DATA), var_reps])
     #Generate signal array from temp values
     for iTI in range(len(TI_NP)):
-        signal_array[iTI,:] = S_biX_6p(TE_DATA, *full_params, TI = TI_NP[iTI])
+        signal_array[iTI,:,:] = raw_data[:,iTI,:]
 
     #Temp Parameter matrices
-    param_est_COFFEE = np.zeros((var_reps, len(full_params)))
-    param_est_cvn = np.zeros((var_reps, len(full_params)))
-    param_est_cF = np.zeros((var_reps, len(full_params)))
+    param_est_COFFEE = np.zeros((var_reps, len(true_params)))
+    param_est_cvn = np.zeros((var_reps, len(true_params)))
+    param_est_cF = np.zeros((var_reps, len(true_params)))
 
     lb, ub = get_func_bounds(S_biX_6p)
 
-    MSE_mat = np.zeros((3, len(full_params)))
-    var_mat = np.zeros((3, len(full_params)))
-    bias_mat = np.zeros((3, len(full_params)))
+    MSE_mat = np.zeros((3, len(true_params)))
+    var_mat = np.zeros((3, len(true_params)))
+    bias_mat = np.zeros((3, len(true_params)))
 
     for nr in range(var_reps):    #Loop through all noise realizations
-        noised_data = add_noise(signal_array, SNR_value)
+        noised_data = signal_array[:,:,nr]
 
         param_est_cF[nr,:] = preEstimate_parameters(TE_DATA, TI_NP, noised_data, lb, ub)
         param_est_COFFEE[nr,:], param_est_cvn[nr,:] = estimate_parameters(param_est_cF[nr,:], TI_NP, noised_data, lb, ub, Exp_label_NP, Exp_label_STANDARD)
 
-    MSE_mat[0,:], var_mat[0,:], bias_mat[0,:] = calc_MSE(param_est_COFFEE, full_params)
-    MSE_mat[1,:], var_mat[1,:], bias_mat[1,:] = calc_MSE(param_est_cvn, full_params) 
-    MSE_mat[2,:], var_mat[2,:], bias_mat[2,:] = calc_MSE(param_est_cF, full_params)
+    MSE_mat[0,:], var_mat[0,:], bias_mat[0,:] = calc_MSE(param_est_COFFEE, true_params)
+    MSE_mat[1,:], var_mat[1,:], bias_mat[1,:] = calc_MSE(param_est_cvn, true_params) 
+    MSE_mat[2,:], var_mat[2,:], bias_mat[2,:] = calc_MSE(param_est_cF, true_params)
 
     feature_df['MSE'] = [MSE_mat]
     feature_df['var'] = [var_mat]
     feature_df['bias'] = [bias_mat]
     feature_df['pEst_AIC'] = [param_est_COFFEE]
     feature_df['pEst_cf'] = [param_est_cF]
+    feature_df['pEst_cvn'] = [param_est_cvn]
 
     return feature_df
 
+norm_factor = det_normFactor(np.mean(raw_data[:,-1,:], axis = -1))
+raw_data = raw_data/norm_factor
+# print(f"All data has been normalized by the normalization factor value of {norm_factor: 0.2f}")
 
 
 #### Looping through Iterations of the brain - applying parallel processing to improve the speed
@@ -441,15 +482,15 @@ if __name__ == '__main__':
 ############## Save General Code Code ################
 
 hprParams = {
-    "np1_array": np1_array,         #first iterator
-    "np2_array": np2_array,         #second iterator
-    "T2_ratio": T2rat_array,        #third iterator
-    "SNR_array": SNR_array,         #fourth iterator
+    "TI1g_indices": TI1g_indices,         #first iterator
+    "TI2g_indices": TI2g_indices,         #second iterator
     "true_params": true_params,
-    "nTE": n_TE,
-    "dTE": TE_step,
-    "var_reps": var_reps,
-    'multi_start': multi_starts_obj
+    "TI_STANDARD": TI_STANDARD,
+    "spacing": sp,
+    "num_TE": ext,
+    'multi_start': multi_starts_obj,
+    'run_number': run_number,
+    'norm_factor': norm_factor
 }
 
 f = open(f'{data_folder}/hprParameter_AIC_{add_tag}_T2rat_SNRsuite_{day}{month}{year}.pkl','wb')
