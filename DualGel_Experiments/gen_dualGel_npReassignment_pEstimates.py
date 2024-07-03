@@ -79,7 +79,6 @@ TI1g_indices = np.arange(TI_STANDARD_indices[5]+1,TI_STANDARD_indices[7],1)
 ### For TI2star we have 15% boundaries with sampling at every 1 ms
 ### This results in 75 points - we use every third point for 25 points total
 TI2g_indices = np.arange(TI_STANDARD_indices[7]+1,TI_STANDARD_indices[9],3)
-np.append(TI2g_indices,TI_STANDARD_indices[8])
 
 #This block identifies the moX indices with a one and all biX indices with a zero
 Exp_STANDARD = np.zeros(len(TI_STANDARD))
@@ -404,10 +403,10 @@ def generate_all_estimates(i_param_combo):
     TI_NP[index_TI1star] = TI_DATA[TI1ind]
     TI_NP[index_TI2star] = TI_DATA[TI2ind]
 
-    feature_df = pd.DataFrame(columns = ["TI1*g","TI2*g","TI_DATA", "MSE", "Var", "bias", "pEst_cvn", "pEst_AIC", "pEst_cf"])
+    feature_df = pd.DataFrame(columns = ["TI1*g","TI2*g","TI_DATA", "MSE", "var", "bias", "pEst_cvn", "pEst_AIC", "pEst_cf"])
 
-    feature_df["TI1*g"] = TI_DATA[TI1ind]
-    feature_df["TI2*g"] = TI_DATA[TI2ind]
+    feature_df["TI1*g"] = [TI_DATA[TI1ind]]
+    feature_df["TI2*g"] = [TI_DATA[TI2ind]]
     feature_df["TI_DATA"] = [TI_NP]
 
     signal_array = np.zeros([len(TI_NP), len(TE_DATA), var_reps])
@@ -492,7 +491,8 @@ hprParams = {
     "num_TE": ext,
     'multi_start': multi_starts_obj,
     'run_number': run_number,
-    'norm_factor': norm_factor
+    'norm_factor': norm_factor,
+    'n_noise_realizations': var_reps
 }
 
 f = open(f'{data_folder}/hprParameter_run{run_number}_{day}{month}{year}.pkl','wb')
