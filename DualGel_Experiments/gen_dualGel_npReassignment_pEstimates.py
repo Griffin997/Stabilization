@@ -31,7 +31,8 @@ cwd = os.getcwd()
 experiment_folder = "DualGel_Experiments"
 
 ####### Options #######
-randStart = True                  #Initial guess for parameter values in random locations
+randStart = False                  #Initial guess for parameter values in random locations
+gen_stand_ref = False
 
 run_number = 78
 
@@ -73,12 +74,16 @@ TE_DATA = np.arange(1,2048.1,1)*0.4 #ms
 
 TI_STANDARD_indices = [np.where(iTI == TI_DATA)[0][0] for iTI in TI_STANDARD]
 
-#These are the windows that we are going to be analyzing
-### For TI1star we have 15% boundaries with sampling at every 1 ms - we can use all 21 points
-TI1g_indices = np.arange(TI_STANDARD_indices[5]+1,TI_STANDARD_indices[7],1)
-### For TI2star we have 15% boundaries with sampling at every 1 ms
-### This results in 75 points - we use every third point for 25 points total
-TI2g_indices = np.arange(TI_STANDARD_indices[7]+1,TI_STANDARD_indices[9],3)
+if gen_stand_ref:
+    TI1g_indices = [TI_STANDARD_indices[index_TI1star]]
+    TI2g_indices = [TI_STANDARD_indices[index_TI2star]]
+else:
+    #These are the windows that we are going to be analyzing
+    ### For TI1star we have 15% boundaries with sampling at every 1 ms - we can use all 21 points
+    TI1g_indices = np.arange(TI_STANDARD_indices[5]+1,TI_STANDARD_indices[7],1)
+    ### For TI2star we have 15% boundaries with sampling at every 1 ms
+    ### This results in 75 points - we use every third point for 25 points total
+    TI2g_indices = np.arange(TI_STANDARD_indices[7]+1,TI_STANDARD_indices[9],3)
 
 #This block identifies the moX indices with a one and all biX indices with a zero
 Exp_STANDARD = np.zeros(len(TI_STANDARD))
@@ -129,9 +134,14 @@ year = date.strftime('%y')
 
 num_cpus_avail = np.min([len(target_iterator),60])
 
+if gen_stand_ref:
+    front_label = 'SR_'
+else:
+    front_label = ''
+
 data_path = f"{experiment_folder}/DG_Analysis_DATA"
 add_tag = ""
-data_tag = (f"reassignExp_run{run_number}_{add_tag}{day}{month}{year}")
+data_tag = (f"{front_label}reassignExp_run{run_number}_{add_tag}{day}{month}{year}")
 data_folder = (os.getcwd() + f'/{data_path}')
 os.makedirs(data_folder, exist_ok = True)
 
@@ -229,8 +239,8 @@ def set_p0(func, random = True):
         # elif f_name.find("biX") > -1:
         #     p0 = [75, 75, 0.5, 0.5, 75, 75]
         # else:
-        # p0 = true_params
-        p0 = np.zeros(len(ParamTitle_6p))
+        p0 = true_params
+        # p0 = np.zeros(len(ParamTitle_6p))
             
     return p0
 
@@ -495,6 +505,6 @@ hprParams = {
     'n_noise_realizations': var_reps
 }
 
-f = open(f'{data_folder}/hprParameter_run{run_number}_{day}{month}{year}.pkl','wb')
+f = open(f'{data_folder}/{front_label}hprParameter_run{run_number}_{day}{month}{year}.pkl','wb')
 pickle.dump(hprParams,f)
 f.close()
