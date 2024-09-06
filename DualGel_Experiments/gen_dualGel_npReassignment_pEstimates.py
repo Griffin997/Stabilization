@@ -32,7 +32,7 @@ experiment_folder = "DualGel_Experiments"
 
 ####### Options #######
 randStart = False                  #Initial guess for parameter values in random locations
-gen_stand_ref = False
+gen_stand_ref = True
 
 run_number = 78
 
