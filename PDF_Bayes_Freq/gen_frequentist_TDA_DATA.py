@@ -57,7 +57,7 @@ TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
 
 #SNR Values to Evaluate
-SNR_value = 1000
+SNR_value = 10000
 
 #Number of noisy realizations
 var_reps = 100000
@@ -74,7 +74,7 @@ day = date.strftime('%d')
 month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
-num_cpus_avail = np.min([len(target_iterator),40])
+num_cpus_avail = np.min([len(target_iterator),3])
 data_path = "PDF_Bayes_Freq/TDA_freq_DATA"
 add_tag = ""
 data_head = "manyTI"
