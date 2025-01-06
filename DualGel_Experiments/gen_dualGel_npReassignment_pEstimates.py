@@ -34,7 +34,7 @@ experiment_folder = "DualGel_Experiments"
 randStart = False                  #Initial guess for parameter values in random locations
 gen_stand_ref = True
 
-run_number = 78
+run_number = 82
 
 file_oi = f"real_phased_run{run_number}" #imag_unphased_dataset    real_unphased_dataset   real_phased_dataset
 
@@ -132,7 +132,7 @@ day = date.strftime('%d')
 month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
-num_cpus_avail = np.min([len(target_iterator),60])
+num_cpus_avail = np.min([len(target_iterator), 15, mp.cpu_count()])
 
 if gen_stand_ref:
     front_label = 'SR_'
@@ -193,10 +193,10 @@ def get_func_bounds(func):
     f_name = func.__name__
     if f_name == "S_biX_6p":
         lower_bound = (1, 1, 0, 0, 1, 1)
-        upper_bound = (2000, 2000, 1, 1, 150, 150)
+        upper_bound = (500, 500, 1, 1, 150, 150)
     elif f_name == "S_moX_3p":
         lower_bound = (1, 0, 1)
-        upper_bound = (2000, 1, 150)
+        upper_bound = (500, 1, 150)
     elif f_name == "S_biX_4p":
         lower_bound = (-1, -1, 1, 1)
         upper_bound = (1, 1, 150, 150)
@@ -300,7 +300,7 @@ def bounds_condensed(lb, ub):
     return bnds
     
 
-#### Ofjective Function
+#### Objective Function
 
 def list_objective_func(param_est, data_2d, TI_array, X_list):
     assert(data_2d.shape[0] == len(TI_array))
@@ -402,7 +402,7 @@ def estimate_parameters(popt, TI_DATA, noised_data, lb, ub, list_curve_X, list_c
 
     return param_est_COFFEE, param_est_cvn
 
-def generate_all_estimates(i_param_combo):
+def generate_all_estimates(i_param_combo, passed_data):
     #Generates a comprehensive matrix of all parameter estimates for all param combinations, 
     #noise realizations, SNR values, and lambdas of interest
     TI1ind, TI2ind = target_iterator[i_param_combo]
@@ -419,10 +419,10 @@ def generate_all_estimates(i_param_combo):
     feature_df["TI2*g"] = [TI_DATA[TI2ind]]
     feature_df["TI_DATA"] = [TI_NP]
 
-    signal_array = np.zeros([len(TI_NP), len(TE_DATA), var_reps])
+    signal_array = np.zeros([len(TE_DATA), len(TI_NP), var_reps])
     #Generate signal array from temp values
     for iTI in range(len(TI_NP)):
-        signal_array[iTI,:,:] = raw_data[:,iTI,:]
+        signal_array[:,iTI,:] = passed_data[:,int(temp_indices[iTI]),:]
 
     #Temp Parameter matrices
     param_est_COFFEE = np.zeros((var_reps, len(true_params)))
@@ -438,8 +438,8 @@ def generate_all_estimates(i_param_combo):
     for nr in range(var_reps):    #Loop through all noise realizations
         noised_data = signal_array[:,:,nr]
 
-        param_est_cF[nr,:] = preEstimate_parameters(TE_DATA, TI_NP, noised_data, lb, ub)
-        param_est_COFFEE[nr,:], param_est_cvn[nr,:] = estimate_parameters(param_est_cF[nr,:], TI_NP, noised_data, lb, ub, Exp_label_NP, Exp_label_STANDARD)
+        param_est_cF[nr,:] = preEstimate_parameters(TE_DATA, TI_NP, np.transpose(noised_data), lb, ub)
+        param_est_COFFEE[nr,:], param_est_cvn[nr,:] = estimate_parameters(param_est_cF[nr,:], TI_NP, np.transpose(noised_data), lb, ub, Exp_label_NP, Exp_label_STANDARD)
 
     MSE_mat[0,:], var_mat[0,:], bias_mat[0,:] = calc_MSE(param_est_COFFEE, true_params)
     MSE_mat[1,:], var_mat[1,:], bias_mat[1,:] = calc_MSE(param_est_cvn, true_params) 
@@ -455,9 +455,8 @@ def generate_all_estimates(i_param_combo):
     return feature_df
 
 norm_factor = det_normFactor(np.mean(raw_data[:,-1,:], axis = -1))
-raw_data = raw_data/norm_factor
-# print(f"All data has been normalized by the normalization factor value of {norm_factor: 0.2f}")
-
+normed_data = raw_data/norm_factor
+# print(f"All data was normalized by the normalization factor value of {norm_factor: 0.2f}")
 
 #### Looping through Iterations of the brain - applying parallel processing to improve the speed
 if __name__ == '__main__':
@@ -466,16 +465,14 @@ if __name__ == '__main__':
     print("Finished Assignments...")
 
     ##### Set number of CPUs that we take advantage of
-    
-    if num_cpus_avail >= 10:
-        print("Using Super Computer")
+    print(f"Using {num_cpus_avail} cpu")
 
     lis = []
 
     with mp.Pool(processes = num_cpus_avail) as pool:
 
         with tqdm(total = len(target_iterator)) as pbar:
-            for estimates_dataframe in pool.imap_unordered(generate_all_estimates, range(len(target_iterator))):
+            for estimates_dataframe in pool.imap_unordered(functools.partial(generate_all_estimates, passed_data = normed_data), range(len(target_iterator))):
             
                 lis.append(estimates_dataframe)
 
@@ -508,3 +505,4 @@ hprParams = {
 f = open(f'{data_folder}/{front_label}hprParameter_run{run_number}_{day}{month}{year}.pkl','wb')
 pickle.dump(hprParams,f)
 f.close()
+
