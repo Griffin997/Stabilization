@@ -34,12 +34,12 @@ randStart = True                  #Initial guess for parameter values in random 
 
 ######All Fixed parameters for code
 #Parameters held constant
-T11 = 600
-T12 = 1200
-c1 = 0.4
-c2 = 0.6 
-T21 = 40
-T22 = 60
+T11 = 92 #600
+T12 = 353 #1200
+c1 = 0.5 #0.4
+c2 = 0.5 #0.6 
+T21 = 31 #40
+T22 = 41 #60
 
 true_params = np.array([T11, T12, c1, c2, T21, T22])
 
@@ -105,7 +105,7 @@ day = date.strftime('%d')
 month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
-num_cpus_avail = np.min([len(target_iterator),50])
+num_cpus_avail = np.min([len(target_iterator),4])
 data_path = "Reassign_Experiment/Reassign_DATA"
 add_tag = "illT2_large"
 data_tag = (f"reassignExp_AIC_{add_tag}_SNR_{SNR_value}_{day}{month}{year}")
