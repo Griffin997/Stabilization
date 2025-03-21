@@ -30,12 +30,12 @@ import functools
 ######All Fixed parameters for code
 #Parameters held constant
 #Parameters held constant
-T11 = 600
-T12 = 1200
-c1 = 0.4
-c2 = 0.6 
-T21 = 40
-T22 = 100
+T11 = 92 #600
+T12 = 353 #1200
+c1 = 0.5 #0.4
+c2 = 0.5 #0.6 
+T21 = 31 #40
+T22 = 41 #100
 
 true_params = np.array([T11, T12, c1, c2, T21, T22])
 
@@ -63,7 +63,7 @@ ParamTitle_6p = [r'$T_{11}$', r'$T_{12}$', r'$c_1$', r'$c_2$', r'$T_{21}$', r'$T
 
 target_iterator = [(a,b) for a in TI_STANDARD for b in SNR_array]
 
-num_cpus_avail = np.min([len(target_iterator),60])
+num_cpus_avail = np.min([len(target_iterator),4])
 
 #### Important for Naming
 date = date.today()
