@@ -65,7 +65,7 @@ assert(TI_low < TI2star and TI2star < TI_high)
 SNR_value = 500
 
 #Number of noisy realizations
-var_reps = 10000
+var_reps = 100
 
 #Number of tasks to execute
 target_iterator = [(a,b) for a in TI_DATA for b in range(var_reps)]
@@ -76,8 +76,8 @@ day = date.strftime('%d')
 month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
-num_cpus_avail = np.min([len(target_iterator),40])
-data_path = "InversionExp_Characteristics/MC_DATA"
+num_cpus_avail = np.min([len(target_iterator),4])
+data_path = "MC_Tests/MC_DATA"
 add_tag = ""
 data_head = "trueStart"
 data_tag = (f"{data_head}_SNR{SNR_value}_iter{var_reps}_{add_tag}{day}{month}{year}")
