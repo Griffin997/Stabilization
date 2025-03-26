@@ -32,7 +32,7 @@ experiment_folder = "DualGel_Experiments"
 
 ####### Options #######
 randStart = False                  #Initial guess for parameter values in random locations
-gen_stand_ref = True
+gen_stand_ref = True                #If true --> generating log spaced TI values :: if false --> generating all combinations of TI values
 
 run_number = 82
 
@@ -445,6 +445,7 @@ def generate_all_estimates(i_param_combo, passed_data):
     MSE_mat[1,:], var_mat[1,:], bias_mat[1,:] = calc_MSE(param_est_cvn, true_params) 
     MSE_mat[2,:], var_mat[2,:], bias_mat[2,:] = calc_MSE(param_est_cF, true_params)
 
+    #These are the elements stored in a _reassignExp_ file
     feature_df['MSE'] = [MSE_mat]
     feature_df['var'] = [var_mat]
     feature_df['bias'] = [bias_mat]
