@@ -70,8 +70,8 @@ Exp_label_NP = [curve_options[int(elem)] for elem in Exp_NP]
 Exp_label_STANDARD = [curve_options[int(elem)] for elem in Exp_STANDARD]
 
 #Adjusting how the window center varies
-np1_range = TI1star*0.35//1
-np2_range = TI2star*0.35//1
+np1_range = TI1star*0.15//1
+np2_range = TI2star*0.15//1
 np1_num = 35
 np2_num = 35
 
