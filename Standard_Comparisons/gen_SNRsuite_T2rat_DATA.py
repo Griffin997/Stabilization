@@ -55,12 +55,12 @@ TI1star = np.log(2)*T11
 TI2star = np.log(2)*T12
 
 #Adjusting the ratio of T21 and T22
-T2rat_array = np.arange(1.5, 2.51, 0.1)
+T2rat_array = np.array([1.5,2.0,2.5]) #np.arange(1.5, 2.51, 0.1)
 
 #SNR Values to Evaluate
-SNR_array = [25,35,50,75,100,150,250,500]#10**np.linspace(np.log10(25), np.log10(250), 15)
+SNR_array = [25,100,500]#[25,35,50,75,100,150,250,500]#10**np.linspace(np.log10(25), np.log10(250), 15)
 
-var_reps = 1000
+var_reps = 10#1000
 
 if randStart:
     multi_starts_obj = 2
@@ -79,7 +79,7 @@ day = date.strftime('%d')
 month = date.strftime('%B')[0:3]
 year = date.strftime('%y')
 
-num_cpus_avail = np.min([len(target_iterator),40])
+num_cpus_avail = np.min([len(target_iterator),4])
 data_path = "Standard_Comparisons/Comparison_DATA"
 add_tag = ""
 data_tag = (f"SNRsuite_T2rat_{add_tag}{day}{month}{year}")
@@ -271,7 +271,7 @@ def generate_all_estimates(i_param_combo):
     T22_temp = T21*T2_rat
     full_params = np.append(true_params,[T22_temp])
 
-    feature_df = pd.DataFrame(columns = ["T2_rat", "SNR", "SNR_eTime","TI_DATA","MSE", "Var", "bias", "pEst_AIC", "pEst_cf"])
+    feature_df = pd.DataFrame(columns = ["T2_rat", "SNR", "SNR_eTime","TI_DATA","MSE", "var", "bias", "pEst_AIC", "pEst_cf"])
 
     feature_df["T2_rat"] = [T2_rat]
     feature_df["SNR"] = [SNR_value]

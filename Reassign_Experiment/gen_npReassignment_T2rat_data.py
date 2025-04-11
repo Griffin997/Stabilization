@@ -34,11 +34,11 @@ randStart = True                  #Initial guess for parameter values in random 
 
 ######All Fixed parameters for code
 #Parameters held constant
-T11 = 92 #600
-T12 = 353 #1200
-c1 = 0.5 #0.4
-c2 = 0.5 #0.6 
-T21 = 31 #40
+T11 = 600
+T12 = 1200
+c1 = 0.4
+c2 = 0.6 
+T21 = 40
 
 
 true_params = np.array([T11, T12, c1, c2, T21])
@@ -74,12 +74,12 @@ np1_array = TI1star*np.array([-.15, -.125, -0.1, -0.075, -0.05, -0.025, 0, 0.025
 np2_array = TI2star*np.array([-.15, -.125, -0.1, -0.075, -0.05, -0.025, 0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15])//1
 
 #Adjusting the ratio of T21 and T22
-T2rat_array = np.array([41/31]) #np.arange(1.5, 2.51, 0.1)
+T2rat_array = np.array([1.5,2.0,2.5]) #np.arange(1.5, 2.51, 0.1)
 
 #SNR Values to Evaluate
-SNR_array = [100] #[25,35,50,75,100,150,250,500]#10**np.linspace(np.log10(25), np.log10(250), 15)
+SNR_array = [25,100,500]#[25,35,50,75,100,150,250,500]#10**np.linspace(np.log10(25), np.log10(250), 15)
 
-var_reps = 1000
+var_reps = 10#1000
 
 if randStart:
     multi_starts_obj = 2
